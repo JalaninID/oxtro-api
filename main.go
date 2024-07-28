@@ -1,7 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"app/config"
+	"app/injector"
+	"app/routers"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	conf := config.NewConfig()
+	cronInterest := injector.InitializedCronInterest(conf.Logger, conf.Database)
+	go cronInterest.DeleteInterestAfterOneDay()
+
+	router := routers.NewRouter(conf)
+	router.RouterAuth()
+	router.RouterPartner()
+	router.RouterUser()
+	router.Run()
 }

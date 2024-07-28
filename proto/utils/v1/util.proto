@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package util.v1;
+
+option go_package = "app/gen/proto/utils/v1;utilv1";
+
+message Empty {}
+
+message Pagination {
+      int32 page = 1;
+      int32 per_page = 2;
+      int32 total = 3;
+      int32 total_page = 4;
+}
