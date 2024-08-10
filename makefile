@@ -7,7 +7,7 @@ wire :
 
 test :
 	go test -v ./...
-gow :
+run :
 	@echo "Run server"
 	export \
 	DB_TYPE=$(DB_TYPE) \

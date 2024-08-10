@@ -1,11 +1,11 @@
 //go:build wireinject
 // +build wireinject
-
 package injector
 
 import (
 	"app/domain"
 	"app/repository/repo_user"
+	"app/service/service_organization"
 	"app/service/service_user"
 
 	"github.com/google/wire"
@@ -24,5 +24,10 @@ var newSetUserRepository = wire.NewSet(
 // InitializedUser is a function to initialize user service
 func InitializedUser(logger *logrus.Logger, db *gorm.DB) *service_user.ServiceUser {
 	wire.Build(newSetUserRepository, service_user.NewService)
+	return nil
+}
+
+func InitializedOrganization() *service_organization.Organization {
+	wire.Build(service_organization.NewOrganizationService)
 	return nil
 }

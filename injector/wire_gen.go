@@ -12,6 +12,7 @@ import (
 	"app/repository/repo_interest"
 	"app/repository/repo_user"
 	"app/service/service_auth"
+	"app/service/service_organization"
 	"app/service/service_partner"
 	"app/service/service_user"
 	"github.com/google/wire"
@@ -51,6 +52,11 @@ func InitializedUser(logger *logrus.Logger, db *gorm.DB) *service_user.ServiceUs
 	repository := repo_user.NewRepository(db)
 	serviceUser := service_user.NewService(logger, repository)
 	return serviceUser
+}
+
+func InitializedOrganization() *service_organization.Organization {
+	organization := service_organization.NewOrganizationService()
+	return organization
 }
 
 // injector_partner.go:

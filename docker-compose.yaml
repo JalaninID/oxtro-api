@@ -11,7 +11,7 @@ services:
       - ./../data:/var/lib/postgresql/data
     ports:
       - 5555:5432
-  app:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,3 +20,14 @@ services:
       - db
     ports:
       - 8080:8080
+  frontend:
+    build:
+      context: ./oxtro-ui
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - 3000:3000
+
+  
