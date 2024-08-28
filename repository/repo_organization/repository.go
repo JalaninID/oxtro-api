@@ -1,4 +1,4 @@
-package repo_user
+package repo_organization
 
 import "gorm.io/gorm"
 

@@ -20,6 +20,19 @@ run :
 	JWT_SECRET_KEY=$(JWT_SECRET_KEY) \
 	&& gow run main.go
 
+run-dev :
+	@echo "Run server"
+	export \
+	DB_TYPE=$(DB_TYPE) \
+	DB_USER=$(DB_USER) \
+	DB_NAME=$(DB_NAME) \
+	DB_PASS=$(DB_PASS) \
+	DB_HOST=$(DB_HOST) \
+	DB_PORT=$(DB_PORT) \
+	JWT_TIME_DURATION=$(JWT_TIME_DURATION) \
+	JWT_SECRET_KEY=$(JWT_SECRET_KEY) \
+	&& go run main.go
+
 url=$(DB_TYPE)://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 migration-up:
 	migrate -database "$(url)" -path $(DB_MIGRATION_PATH) up $(version)

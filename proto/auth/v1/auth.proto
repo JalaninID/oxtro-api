@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package auth.v1;
 
-option go_package = "app/gen/proto/auth/v1;authv1";
-
-import "proto/user/v1/user.proto";
-
 message LoginRequest {
       string username = 1;
       string password = 2;
@@ -18,7 +14,6 @@ message LoginResponse {
 message RegisterRequest{
       string username = 1;
       string password = 2;
-      user.v1.GENDER gender = 3;
       string name = 4;
       string profile = 5;
       bool premium = 6;
@@ -33,10 +28,7 @@ message RegisterResponse{
       string profile = 6;
       string status = 7;
       bool premium = 8;
-      user.v1.GENDER Gender = 9;
 }
 
-service ServiceAuth {
-      rpc Login(LoginRequest) returns (LoginResponse);
-      rpc Register(RegisterRequest) returns (RegisterResponse);
+service Auth {
 }
