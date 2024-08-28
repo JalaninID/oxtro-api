@@ -1,6 +1,9 @@
 package pkg
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func SQLXAndMatch(where string, args []interface{}, column string, val interface{}) (string, []interface{}) {
 	where += " AND " + column + " = ?"
@@ -47,4 +50,15 @@ func SQLXAndNotIn(where string, args []interface{}, column string, val interface
 	where += " AND " + column + " NOT IN (?)"
 	args = append(args, val)
 	return where, args
+}
+
+func DebugQuery(query string, args ...interface{}) {
+	// replce ? to args
+	for _, arg := range args {
+		query = strings.Replace(query, "?", fmt.Sprintf("%v", arg), 1)
+	}
+	colorGreen := "\033[32m"
+	colorReset := "\033[0m"
+
+	fmt.Printf("%s%s%s\n", colorGreen, query, colorReset)
 }

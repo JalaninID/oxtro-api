@@ -43,6 +43,34 @@ func (_m *RepositoryOrganization) CreateOrganization(ctx context.Context, organi
 	return r0, r1
 }
 
+// DetailOrganization provides a mock function with given fields: ctx, filter
+func (_m *RepositoryOrganization) DetailOrganization(ctx context.Context, filter model.FilterOrganization) (model.Organization, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DetailOrganization")
+	}
+
+	var r0 model.Organization
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization) (model.Organization, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization) model.Organization); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		r0 = ret.Get(0).(model.Organization)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.FilterOrganization) error); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewRepositoryOrganization creates a new instance of RepositoryOrganization. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewRepositoryOrganization(t interface {
