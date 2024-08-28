@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewPostgre is a function to create a new postgre connection
 func NewPostgre() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
 		os.Getenv("DB_HOST"),

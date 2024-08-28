@@ -20,6 +20,8 @@ var levelList = []string{
 	"TRACE",
 }
 
+// Format is a function to format the log,
+// entry is the log entry
 func (mf *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var b *bytes.Buffer
 	if entry.Buffer != nil {
@@ -46,6 +48,7 @@ func (mf *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+// NewLogger is a function to create a new logger
 func NewLogger() *logrus.Logger {
 
 	logger := logrus.New()

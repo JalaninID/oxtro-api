@@ -7,11 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// Config is a struct to store the config
 type Config struct {
+	// Database is a pointer to the database
 	Database *gorm.DB
-	Logger   *logrus.Logger
+	// Logger is a pointer to the logger
+	Logger *logrus.Logger
 }
 
+// NewConfig is a function to create a new config
 func NewConfig() *Config {
 	db, err := NewPostgre()
 	if err != nil {
