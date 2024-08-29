@@ -25,10 +25,13 @@ type (
 		Description string
 	}
 	FilterOrganization struct {
-		ID     string
+		ID     int
 		UUID   string
 		Name   string
 		Domain string
+		Offset int
+		Limit  int
+		Sort   string
 	}
 )
 
