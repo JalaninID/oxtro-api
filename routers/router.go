@@ -3,6 +3,7 @@ package routers
 import (
 	"app/config"
 	"app/middleware"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,5 +25,9 @@ func NewRouter(config *config.Config) *Router {
 }
 func (r *Router) Run() error {
 	handler := middleware.WithCORS(r.Engine)
-	return http.ListenAndServe(":8080", h2c.NewHandler(handler, &http2.Server{}))
+	return http.ListenAndServe(":8080", h2c.NewHandler(handler, &http2.Server{
+		CountError: func(errType string) {
+			fmt.Println(errType)
+		},
+	}))
 }

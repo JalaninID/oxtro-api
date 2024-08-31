@@ -9,6 +9,6 @@ func main() {
 	conf := config.NewConfig()
 
 	router := routers.NewRouter(conf)
-	// router.RouterAuth()
+	router.RouterOrganization()
 	router.Run()
 }

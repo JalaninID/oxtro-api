@@ -13,6 +13,9 @@ func (r *repository) UpdateOrganization(ctx context.Context, filter model.Filter
 	if filter.Name != "" {
 		where, args = pkg.SQLXAndMatch(where, args, "name", filter.Name)
 	}
+	if filter.Domain != "" {
+		where, args = pkg.SQLXAndMatch(where, args, "domain", filter.Domain)
+	}
 	if filter.ID != 0 {
 		where, args = pkg.SQLXAndMatch(where, args, "id", filter.ID)
 	}

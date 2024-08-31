@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package organization.v1;
+
+import "tools/v1/pagination.proto";
+
+message RequestOrganization {
+    int64  id = 1;
+    string uuid = 2;
+    string name = 3;
+    string domain = 4;
+    string logo = 5;
+    string description = 6;
+}
+
+message ResponseOrganization {
+    string uuid = 1;
+    string created_at = 2;
+    string updated_at = 3;
+    string name = 4;
+    string domain = 5;
+    string logo = 6;
+    string description = 7;
+}
+
+message ResponseOrganizationList {
+    repeated ResponseOrganization organizations = 1;
+    tools.v1.Pagination pagination = 2;
+}
+
+service Organization {
+    rpc CreateOrganization(RequestOrganization) returns (ResponseOrganization);
+    rpc DetailOrganization(RequestOrganization) returns (ResponseOrganization);
+}
