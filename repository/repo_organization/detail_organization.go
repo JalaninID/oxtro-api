@@ -8,7 +8,7 @@ import (
 
 // DetailOrganization
 func (r *repository) DetailOrganization(ctx context.Context, filter model.FilterOrganization) (model.Organization, error) {
-	where := "WHERE deleted_at IS NULL "
+	where := " deleted_at IS NULL "
 	args := []any{}
 	if filter.ID != 0 {
 		where, args = pkg.SQLXAndMatch(where, args, "id", filter.ID)

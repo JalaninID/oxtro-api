@@ -14,4 +14,5 @@ type RepositoryOrganization interface {
 
 type ServiceOrganization interface {
 	CreateOrganization(ctx context.Context, req *organizationv1.RequestOrganization) (*organizationv1.ResponseOrganization, error)
+	DetailOrganization(ctx context.Context, params *organizationv1.ParamsOrganization) (*organizationv1.ResponseOrganization, error)
 }

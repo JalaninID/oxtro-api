@@ -25,3 +25,11 @@ func (h *Organization) CreateOrganization(ctx context.Context, req *connect.Requ
 	}
 	return connect.NewResponse(response), nil
 }
+
+func (h *Organization) DetailOrganization(ctx context.Context, req *connect.Request[organizationv1.ParamsOrganization]) (*connect.Response[organizationv1.ResponseOrganization], error) {
+	response, err := h.serviceOrg.DetailOrganization(ctx, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(response), nil
+}

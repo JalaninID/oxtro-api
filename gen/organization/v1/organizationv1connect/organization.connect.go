@@ -51,7 +51,7 @@ var (
 // OrganizationClient is a client for the organization.v1.Organization service.
 type OrganizationClient interface {
 	CreateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
-	DetailOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
+	DetailOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 }
 
 // NewOrganizationClient constructs a client for the organization.v1.Organization service. By
@@ -70,7 +70,7 @@ func NewOrganizationClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(organizationCreateOrganizationMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		detailOrganization: connect.NewClient[v1.RequestOrganization, v1.ResponseOrganization](
+		detailOrganization: connect.NewClient[v1.ParamsOrganization, v1.ResponseOrganization](
 			httpClient,
 			baseURL+OrganizationDetailOrganizationProcedure,
 			connect.WithSchema(organizationDetailOrganizationMethodDescriptor),
@@ -82,7 +82,7 @@ func NewOrganizationClient(httpClient connect.HTTPClient, baseURL string, opts .
 // organizationClient implements OrganizationClient.
 type organizationClient struct {
 	createOrganization *connect.Client[v1.RequestOrganization, v1.ResponseOrganization]
-	detailOrganization *connect.Client[v1.RequestOrganization, v1.ResponseOrganization]
+	detailOrganization *connect.Client[v1.ParamsOrganization, v1.ResponseOrganization]
 }
 
 // CreateOrganization calls organization.v1.Organization.CreateOrganization.
@@ -91,14 +91,14 @@ func (c *organizationClient) CreateOrganization(ctx context.Context, req *connec
 }
 
 // DetailOrganization calls organization.v1.Organization.DetailOrganization.
-func (c *organizationClient) DetailOrganization(ctx context.Context, req *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
+func (c *organizationClient) DetailOrganization(ctx context.Context, req *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
 	return c.detailOrganization.CallUnary(ctx, req)
 }
 
 // OrganizationHandler is an implementation of the organization.v1.Organization service.
 type OrganizationHandler interface {
 	CreateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
-	DetailOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
+	DetailOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 }
 
 // NewOrganizationHandler builds an HTTP handler from the service implementation. It returns the
@@ -138,6 +138,6 @@ func (UnimplementedOrganizationHandler) CreateOrganization(context.Context, *con
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.Organization.CreateOrganization is not implemented"))
 }
 
-func (UnimplementedOrganizationHandler) DetailOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
+func (UnimplementedOrganizationHandler) DetailOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.Organization.DetailOrganization is not implemented"))
 }

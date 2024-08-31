@@ -23,6 +23,15 @@ message ResponseOrganization {
     string description = 7;
 }
 
+message ParamsOrganization {
+    int32 id = 1;
+    string uuid = 2;
+    string name = 3;
+    string domain = 4;
+    int32 page = 5;
+    int32 per_page = 6;
+}
+
 message ResponseOrganizationList {
     repeated ResponseOrganization organizations = 1;
     tools.v1.Pagination pagination = 2;
@@ -30,5 +39,5 @@ message ResponseOrganizationList {
 
 service Organization {
     rpc CreateOrganization(RequestOrganization) returns (ResponseOrganization);
-    rpc DetailOrganization(RequestOrganization) returns (ResponseOrganization);
+    rpc DetailOrganization(ParamsOrganization) returns (ResponseOrganization);
 }
