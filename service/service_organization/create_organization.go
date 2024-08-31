@@ -13,14 +13,14 @@ import (
 func (s *service) CreateOrganization(ctx context.Context, req *organizationv1.RequestOrganization) (*organizationv1.ResponseOrganization, error) {
 	org := FormatterCreateRequestOrganization(req)
 
-	_, err := s.serviceOrg.DetailOrganization(ctx, model.FilterOrganization{
+	orgDetail, err := s.serviceOrg.DetailOrganization(ctx, model.FilterOrganization{
 		Domain: org.Domain,
 	})
 	if err != nil && err != gorm.ErrRecordNotFound {
 		s.logger.Errorf("error get organization: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
-	if err == nil {
+	if orgDetail.ID != 0 {
 		return nil, connect.NewError(connect.CodeAlreadyExists, constant.ErrOrganizationAlreadyExists)
 	}
 
