@@ -43,6 +43,34 @@ func (_m *RepositoryUser) CreateUser(ctx context.Context, user model.User) (mode
 	return r0, r1
 }
 
+// DetailUser provides a mock function with given fields: ctx, filter
+func (_m *RepositoryUser) DetailUser(ctx context.Context, filter model.FilterUser) (model.User, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DetailUser")
+	}
+
+	var r0 model.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterUser) (model.User, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterUser) model.User); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		r0 = ret.Get(0).(model.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.FilterUser) error); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewRepositoryUser creates a new instance of RepositoryUser. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewRepositoryUser(t interface {
