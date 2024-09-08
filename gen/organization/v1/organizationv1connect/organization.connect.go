@@ -66,7 +66,7 @@ type OrganizationClient interface {
 	CreateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	DetailOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	ListOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganizationList], error)
-	UpdateOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
+	UpdateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	DeleteOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v11.Empty], error)
 }
 
@@ -98,7 +98,7 @@ func NewOrganizationClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(organizationListOrganizationMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		updateOrganization: connect.NewClient[v1.ParamsOrganization, v1.ResponseOrganization](
+		updateOrganization: connect.NewClient[v1.RequestOrganization, v1.ResponseOrganization](
 			httpClient,
 			baseURL+OrganizationUpdateOrganizationProcedure,
 			connect.WithSchema(organizationUpdateOrganizationMethodDescriptor),
@@ -118,7 +118,7 @@ type organizationClient struct {
 	createOrganization *connect.Client[v1.RequestOrganization, v1.ResponseOrganization]
 	detailOrganization *connect.Client[v1.ParamsOrganization, v1.ResponseOrganization]
 	listOrganization   *connect.Client[v1.ParamsOrganization, v1.ResponseOrganizationList]
-	updateOrganization *connect.Client[v1.ParamsOrganization, v1.ResponseOrganization]
+	updateOrganization *connect.Client[v1.RequestOrganization, v1.ResponseOrganization]
 	deleteOrganization *connect.Client[v1.ParamsOrganization, v11.Empty]
 }
 
@@ -138,7 +138,7 @@ func (c *organizationClient) ListOrganization(ctx context.Context, req *connect.
 }
 
 // UpdateOrganization calls organization.v1.Organization.UpdateOrganization.
-func (c *organizationClient) UpdateOrganization(ctx context.Context, req *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
+func (c *organizationClient) UpdateOrganization(ctx context.Context, req *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
 	return c.updateOrganization.CallUnary(ctx, req)
 }
 
@@ -152,7 +152,7 @@ type OrganizationHandler interface {
 	CreateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	DetailOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	ListOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganizationList], error)
-	UpdateOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error)
+	UpdateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error)
 	DeleteOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v11.Empty], error)
 }
 
@@ -225,7 +225,7 @@ func (UnimplementedOrganizationHandler) ListOrganization(context.Context, *conne
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.Organization.ListOrganization is not implemented"))
 }
 
-func (UnimplementedOrganizationHandler) UpdateOrganization(context.Context, *connect.Request[v1.ParamsOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
+func (UnimplementedOrganizationHandler) UpdateOrganization(context.Context, *connect.Request[v1.RequestOrganization]) (*connect.Response[v1.ResponseOrganization], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("organization.v1.Organization.UpdateOrganization is not implemented"))
 }
 

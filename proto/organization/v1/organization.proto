@@ -42,6 +42,6 @@ service Organization {
     rpc CreateOrganization(RequestOrganization) returns (ResponseOrganization);
     rpc DetailOrganization(ParamsOrganization) returns (ResponseOrganization);
     rpc ListOrganization(ParamsOrganization) returns (ResponseOrganizationList);
-    rpc UpdateOrganization(ParamsOrganization) returns (ResponseOrganization);
+    rpc UpdateOrganization(RequestOrganization) returns (ResponseOrganization);
     rpc DeleteOrganization(ParamsOrganization) returns (tools.v1.Empty);
 }
