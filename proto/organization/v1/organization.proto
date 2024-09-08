@@ -3,6 +3,7 @@ syntax = "proto3";
 package organization.v1;
 
 import "tools/v1/pagination.proto";
+import "tools/v1/empty.proto";
 
 message RequestOrganization {
     int64  id = 1;
@@ -40,4 +41,7 @@ message ResponseOrganizationList {
 service Organization {
     rpc CreateOrganization(RequestOrganization) returns (ResponseOrganization);
     rpc DetailOrganization(ParamsOrganization) returns (ResponseOrganization);
+    rpc ListOrganization(ParamsOrganization) returns (ResponseOrganizationList);
+    rpc UpdateOrganization(ParamsOrganization) returns (ResponseOrganization);
+    rpc DeleteOrganization(ParamsOrganization) returns (tools.v1.Empty);
 }

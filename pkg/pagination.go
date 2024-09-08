@@ -4,9 +4,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func Paginate(offset, limit int, sort string, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
+func Paginate(offset, perPage int, sort string, db *gorm.DB) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Offset(offset).Limit(limit).Order(sort)
+		return db.Offset(offset).Limit(perPage).Order(sort)
 	}
 }
 

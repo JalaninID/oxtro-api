@@ -11,7 +11,7 @@ import (
 )
 
 func (s *service) DetailOrganization(ctx context.Context, params *organizationv1.ParamsOrganization) (*organizationv1.ResponseOrganization, error) {
-	org, err := s.serviceOrg.DetailOrganization(ctx, model.FilterOrganization{
+	org, err := s.repoOrg.DetailOrganization(ctx, model.FilterOrganization{
 		ID:     int(params.Id),
 		UUID:   params.Uuid,
 		Name:   params.Name,

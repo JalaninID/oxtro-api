@@ -25,13 +25,13 @@ type (
 		Description string
 	}
 	FilterOrganization struct {
-		ID     int
-		UUID   string
-		Name   string
-		Domain string
-		Offset int
-		Limit  int
-		Sort   string
+		ID      int
+		UUID    string
+		Name    string
+		Domain  string
+		Offset  int
+		PerPage int
+		Sort    string
 	}
 )
 

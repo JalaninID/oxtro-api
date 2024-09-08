@@ -43,6 +43,24 @@ func (_m *RepositoryOrganization) CreateOrganization(ctx context.Context, organi
 	return r0, r1
 }
 
+// DeleteOrganization provides a mock function with given fields: ctx, filter
+func (_m *RepositoryOrganization) DeleteOrganization(ctx context.Context, filter model.FilterOrganization) error {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteOrganization")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization) error); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DetailOrganization provides a mock function with given fields: ctx, filter
 func (_m *RepositoryOrganization) DetailOrganization(ctx context.Context, filter model.FilterOrganization) (model.Organization, error) {
 	ret := _m.Called(ctx, filter)
@@ -64,6 +82,71 @@ func (_m *RepositoryOrganization) DetailOrganization(ctx context.Context, filter
 
 	if rf, ok := ret.Get(1).(func(context.Context, model.FilterOrganization) error); ok {
 		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListOrganization provides a mock function with given fields: ctx, filter
+func (_m *RepositoryOrganization) ListOrganization(ctx context.Context, filter model.FilterOrganization) ([]model.Organization, int, error) {
+	ret := _m.Called(ctx, filter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListOrganization")
+	}
+
+	var r0 []model.Organization
+	var r1 int
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization) ([]model.Organization, int, error)); ok {
+		return rf(ctx, filter)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization) []model.Organization); ok {
+		r0 = rf(ctx, filter)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]model.Organization)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.FilterOrganization) int); ok {
+		r1 = rf(ctx, filter)
+	} else {
+		r1 = ret.Get(1).(int)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, model.FilterOrganization) error); ok {
+		r2 = rf(ctx, filter)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// UpdateOrganization provides a mock function with given fields: ctx, filter, organization
+func (_m *RepositoryOrganization) UpdateOrganization(ctx context.Context, filter model.FilterOrganization, organization model.Organization) (model.Organization, error) {
+	ret := _m.Called(ctx, filter, organization)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateOrganization")
+	}
+
+	var r0 model.Organization
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization, model.Organization) (model.Organization, error)); ok {
+		return rf(ctx, filter, organization)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.FilterOrganization, model.Organization) model.Organization); ok {
+		r0 = rf(ctx, filter, organization)
+	} else {
+		r0 = ret.Get(0).(model.Organization)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.FilterOrganization, model.Organization) error); ok {
+		r1 = rf(ctx, filter, organization)
 	} else {
 		r1 = ret.Error(1)
 	}

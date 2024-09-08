@@ -7,10 +7,10 @@ import (
 )
 
 type service struct {
-	serviceOrg domain.RepositoryOrganization
-	logger     *logrus.Logger
+	repoOrg domain.RepositoryOrganization
+	logger  *logrus.Logger
 }
 
-func NewService(serviceOrg domain.RepositoryOrganization, logger *logrus.Logger) *service {
-	return &service{serviceOrg: serviceOrg, logger: logger}
+func NewService(repoOrg domain.RepositoryOrganization, logger *logrus.Logger) *service {
+	return &service{repoOrg: repoOrg, logger: logger}
 }
