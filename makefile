@@ -8,43 +8,21 @@ wire :
 test :
 	go test -v ./...
 run :
-	@echo "Run server"
-	export \
-	DB_TYPE=$(DB_TYPE) \
-	DB_USER=$(DB_USER) \
-	DB_NAME=$(DB_NAME) \
-	DB_PASS=$(DB_PASS) \
-	DB_HOST=$(DB_HOST) \
-	DB_PORT=$(DB_PORT) \
-	JWT_TIME_DURATION=$(JWT_TIME_DURATION) \
-	JWT_SECRET_KEY=$(JWT_SECRET_KEY) \
-	&& gow run main.go
+	sh -c 'set -a; . ./.env; set +a; gow run main.go'
 
-run-dev :
-	@echo "Run server"
-	export \
-	DB_TYPE=$(DB_TYPE) \
-	DB_USER=$(DB_USER) \
-	DB_NAME=$(DB_NAME) \
-	DB_PASS=$(DB_PASS) \
-	DB_HOST=$(DB_HOST) \
-	DB_PORT=$(DB_PORT) \
-	JWT_TIME_DURATION=$(JWT_TIME_DURATION) \
-	JWT_SECRET_KEY=$(JWT_SECRET_KEY) \
-	&& go run main.go
+url=postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 
-url=$(DB_TYPE)://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable
 migration-up:
-	migrate -database "$(url)" -path $(DB_MIGRATION_PATH) up $(version)
+	migrate -database "$(url)" -path ./migrations/ up $(version)
 	
 migration-down:
-	migrate -database "$(url)" -path $(DB_MIGRATION_PATH) down $(version)
+	migrate -database "$(url)" -path ./migrations/ down $(version)
 	
 migration-create:
-	migrate create -ext sql -dir $(DB_MIGRATION_PATH) -seq $(name)
+	migrate create -ext sql -dir ./migrations/ -seq $(name)
 
 migration-force:
-	migrate -database "$(url)" -path $(DB_MIGRATION_PATH) force $(version)
+	migrate -database "$(url)" -path ./migrations/ force $(version)
 
 migration-version:
-	migrate -database "$(url)" -path $(DB_MIGRATION_PATH) version
+	migrate -database "$(url)" -path ./migrations/ version
