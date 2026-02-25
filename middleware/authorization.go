@@ -4,9 +4,9 @@ import (
 	"app/constant"
 	"app/pkg"
 	"context"
+	"net/http"
 	"strings"
 
-	"connectrpc.com/connect"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,26 +14,26 @@ func Authorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": constant.ErrAuthorization.Error()})
 			return
 		}
 
 		tokenParts := strings.Split(token, " ")
 		if len(tokenParts) != 2 {
-			connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": constant.ErrAuthorization.Error()})
 			return
 		}
 		tokenType := tokenParts[0]
 		tokenValue := tokenParts[1]
 
 		if tokenType != "Bearer" {
-			connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": constant.ErrAuthorization.Error()})
 			return
 		}
 
 		user, err := pkg.VerifyTokenHeader(tokenValue)
 		if err != nil {
-			connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": constant.ErrAuthorization.Error()})
 			return
 		}
 		c.Set("user", user)

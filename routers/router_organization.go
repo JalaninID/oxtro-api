@@ -4,17 +4,16 @@ import (
 	"app/gen/organization/v1/organizationv1connect"
 	"app/injector"
 	"app/middleware"
-	"net/http"
 
 	"connectrpc.com/connect"
 	"github.com/gin-gonic/gin"
 )
 
 func (r *Router) RouterOrganization() {
-	_, handler := organizationv1connect.NewOrganizationHandler(
+	path, handler := organizationv1connect.NewOrganizationHandler(
 		injector.InitializedOrganization(r.config.Database, r.config.Logger),
-		connect.WithInterceptors(middleware.NewOrganizationInterceptor()),
+		connect.WithInterceptors(middleware.NewAuthInterceptor(nil)),
 	)
 
-	r.Engine.POST("/organization/*any", gin.WrapH(http.StripPrefix("/organization", handler)))
+	r.Engine.Any(path+"*any", gin.WrapH(handler))
 }
