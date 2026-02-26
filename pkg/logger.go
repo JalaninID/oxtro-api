@@ -9,6 +9,7 @@ import (
 )
 
 type MyFormatter struct{}
+type RequestDebugFormatter struct{}
 
 var levelList = []string{
 	"PANIC",
@@ -48,6 +49,10 @@ func (mf *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+func (rf *RequestDebugFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	return []byte(entry.Message + "\n"), nil
+}
+
 // NewLogger is a function to create a new logger
 func NewLogger() *logrus.Logger {
 
@@ -55,5 +60,14 @@ func NewLogger() *logrus.Logger {
 
 	logger.SetReportCaller(true)
 	logger.SetFormatter(&MyFormatter{})
+	return logger
+}
+
+// NewRequestDebugLogger creates a compact logger for HTTP access logs.
+func NewRequestDebugLogger() *logrus.Logger {
+	logger := logrus.New()
+	logger.SetReportCaller(false)
+	logger.SetFormatter(&RequestDebugFormatter{})
+	logger.SetLevel(logrus.DebugLevel)
 	return logger
 }

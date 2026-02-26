@@ -6,7 +6,6 @@ import (
 	"app/middleware"
 
 	"connectrpc.com/connect"
-	"github.com/gin-gonic/gin"
 )
 
 func (r *Router) RouterOrganization() {
@@ -15,5 +14,5 @@ func (r *Router) RouterOrganization() {
 		connect.WithInterceptors(middleware.NewAuthInterceptor(nil)),
 	)
 
-	r.Engine.Any(path+"*any", gin.WrapH(handler))
+	r.Mux.Handle(path, handler)
 }
