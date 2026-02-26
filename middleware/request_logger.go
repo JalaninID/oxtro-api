@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,16 +35,50 @@ func WithRequestLogger(next http.Handler, logger *logrus.Logger) http.Handler {
 
 		next.ServeHTTP(recorder, r)
 
-		logger.Debugf(
-			"%s | %d | %s | %s | %s | %s | -",
+		statusText := fmt.Sprintf("%3d", recorder.status)
+		latencyText := fmt.Sprintf("%10s", time.Since(start))
+		ipText := fmt.Sprintf("%-15s", clientIP(r))
+		methodText := fmt.Sprintf("%-7s", r.Method)
+
+		logLine := fmt.Sprintf(
+			"%s | %s | %s | %s | %s | %s | -",
 			start.Local().Format("15:04:05"),
-			recorder.status,
-			time.Since(start),
-			clientIP(r),
-			r.Method,
+			colorStatus(statusText, recorder.status),
+			latencyText,
+			color.New(color.FgHiCyan).Sprint(ipText),
+			colorMethod(methodText, r.Method),
 			r.URL.Path,
 		)
+		logger.Debug(logLine)
 	})
+}
+
+func colorStatus(statusText string, statusCode int) string {
+	switch {
+	case statusCode >= 500:
+		return color.New(color.FgHiRed).Sprint(statusText)
+	case statusCode >= 400:
+		return color.New(color.FgHiYellow).Sprint(statusText)
+	case statusCode >= 300:
+		return color.New(color.FgHiBlue).Sprint(statusText)
+	default:
+		return color.New(color.FgHiGreen).Sprint(statusText)
+	}
+}
+
+func colorMethod(methodText string, method string) string {
+	switch method {
+	case http.MethodGet:
+		return color.New(color.FgHiGreen).Sprint(methodText)
+	case http.MethodPost:
+		return color.New(color.FgHiBlue).Sprint(methodText)
+	case http.MethodPut, http.MethodPatch:
+		return color.New(color.FgHiYellow).Sprint(methodText)
+	case http.MethodDelete:
+		return color.New(color.FgHiRed).Sprint(methodText)
+	default:
+		return color.New(color.FgHiWhite).Sprint(methodText)
+	}
 }
 
 func clientIP(r *http.Request) string {

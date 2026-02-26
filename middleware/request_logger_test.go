@@ -33,9 +33,10 @@ func TestWithRequestLogger_LogsFiberLikeFields(t *testing.T) {
 	logLine := buffer.String()
 	expectedParts := []string{
 		" | 201 | ",
-		" | 127.0.0.1 | ",
-		" | POST | ",
-		" | /organization.v1.Organization/ListOrganization | -",
+		"127.0.0.1",
+		"POST",
+		"/organization.v1.Organization/ListOrganization",
+		" | -",
 	}
 	for _, part := range expectedParts {
 		if !strings.Contains(logLine, part) {
