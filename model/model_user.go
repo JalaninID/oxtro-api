@@ -28,6 +28,12 @@ type (
 		Bio string
 		// Password is the password of the user
 		Password string
+		// EmailVerifiedAt is timestamp when user email verified
+		EmailVerifiedAt *time.Time
+		// LockedUntil is temporary lock for brute-force protection
+		LockedUntil *time.Time
+		// IsActive controls account deactivation
+		IsActive bool
 		// UserOrganization is the user organization
 		UserOrganization UserOrganization `gorm:"foreignKey:UserID;references:ID"`
 	}

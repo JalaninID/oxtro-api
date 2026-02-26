@@ -1,9 +1,12 @@
 package pkg
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/big"
+	"os"
+	"strconv"
 	"time"
 	"unicode"
 
@@ -12,7 +15,13 @@ import (
 
 // encrypt password
 func HashPassword(password string) (string, error) {
-	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	cost := bcrypt.DefaultCost
+	if configured := os.Getenv("BCRYPT_COST"); configured != "" {
+		if parsedCost, err := strconv.Atoi(configured); err == nil && parsedCost >= bcrypt.MinCost && parsedCost <= bcrypt.MaxCost {
+			cost = parsedCost
+		}
+	}
+	bytePassword, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	if err != nil {
 		return "", err
 	}
@@ -75,13 +84,17 @@ func ValidatePassword(password string) error {
 	return nil
 }
 
-var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
-
 func GenerateRandomString(n int) string {
 	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letter[seededRand.Intn(len(letter))]
+		idx, err := rand.Int(rand.Reader, big.NewInt(int64(len(letter))))
+		if err != nil {
+			seeded := time.Now().UnixNano() % int64(len(letter))
+			b[i] = letter[seeded]
+			continue
+		}
+		b[i] = letter[idx.Int64()]
 	}
 	return string(b)
 }

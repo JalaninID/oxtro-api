@@ -7,7 +7,10 @@ package authv1connect
 import (
 	v1 "app/gen/auth/v1"
 	connect "connectrpc.com/connect"
+	context "context"
+	errors "errors"
 	http "net/http"
+	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
@@ -22,13 +25,72 @@ const (
 	AuthName = "auth.v1.Auth"
 )
 
+// These constants are the fully-qualified names of the RPCs defined in this package. They're
+// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+//
+// Note that these are different from the fully-qualified method names used by
+// google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
+// reflection-formatted method names, remove the leading slash and convert the remaining slash to a
+// period.
+const (
+	// AuthRegisterProcedure is the fully-qualified name of the Auth's Register RPC.
+	AuthRegisterProcedure = "/auth.v1.Auth/Register"
+	// AuthLoginProcedure is the fully-qualified name of the Auth's Login RPC.
+	AuthLoginProcedure = "/auth.v1.Auth/Login"
+	// AuthRefreshTokenProcedure is the fully-qualified name of the Auth's RefreshToken RPC.
+	AuthRefreshTokenProcedure = "/auth.v1.Auth/RefreshToken"
+	// AuthLogoutProcedure is the fully-qualified name of the Auth's Logout RPC.
+	AuthLogoutProcedure = "/auth.v1.Auth/Logout"
+	// AuthLogoutAllProcedure is the fully-qualified name of the Auth's LogoutAll RPC.
+	AuthLogoutAllProcedure = "/auth.v1.Auth/LogoutAll"
+	// AuthForgotPasswordProcedure is the fully-qualified name of the Auth's ForgotPassword RPC.
+	AuthForgotPasswordProcedure = "/auth.v1.Auth/ForgotPassword"
+	// AuthResetPasswordProcedure is the fully-qualified name of the Auth's ResetPassword RPC.
+	AuthResetPasswordProcedure = "/auth.v1.Auth/ResetPassword"
+	// AuthChangePasswordProcedure is the fully-qualified name of the Auth's ChangePassword RPC.
+	AuthChangePasswordProcedure = "/auth.v1.Auth/ChangePassword"
+	// AuthVerifyEmailProcedure is the fully-qualified name of the Auth's VerifyEmail RPC.
+	AuthVerifyEmailProcedure = "/auth.v1.Auth/VerifyEmail"
+	// AuthResendEmailVerificationProcedure is the fully-qualified name of the Auth's
+	// ResendEmailVerification RPC.
+	AuthResendEmailVerificationProcedure = "/auth.v1.Auth/ResendEmailVerification"
+	// AuthListSessionsProcedure is the fully-qualified name of the Auth's ListSessions RPC.
+	AuthListSessionsProcedure = "/auth.v1.Auth/ListSessions"
+	// AuthRevokeSessionProcedure is the fully-qualified name of the Auth's RevokeSession RPC.
+	AuthRevokeSessionProcedure = "/auth.v1.Auth/RevokeSession"
+)
+
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	authServiceDescriptor = v1.File_auth_v1_auth_proto.Services().ByName("Auth")
+	authServiceDescriptor                       = v1.File_auth_v1_auth_proto.Services().ByName("Auth")
+	authRegisterMethodDescriptor                = authServiceDescriptor.Methods().ByName("Register")
+	authLoginMethodDescriptor                   = authServiceDescriptor.Methods().ByName("Login")
+	authRefreshTokenMethodDescriptor            = authServiceDescriptor.Methods().ByName("RefreshToken")
+	authLogoutMethodDescriptor                  = authServiceDescriptor.Methods().ByName("Logout")
+	authLogoutAllMethodDescriptor               = authServiceDescriptor.Methods().ByName("LogoutAll")
+	authForgotPasswordMethodDescriptor          = authServiceDescriptor.Methods().ByName("ForgotPassword")
+	authResetPasswordMethodDescriptor           = authServiceDescriptor.Methods().ByName("ResetPassword")
+	authChangePasswordMethodDescriptor          = authServiceDescriptor.Methods().ByName("ChangePassword")
+	authVerifyEmailMethodDescriptor             = authServiceDescriptor.Methods().ByName("VerifyEmail")
+	authResendEmailVerificationMethodDescriptor = authServiceDescriptor.Methods().ByName("ResendEmailVerification")
+	authListSessionsMethodDescriptor            = authServiceDescriptor.Methods().ByName("ListSessions")
+	authRevokeSessionMethodDescriptor           = authServiceDescriptor.Methods().ByName("RevokeSession")
 )
 
 // AuthClient is a client for the auth.v1.Auth service.
 type AuthClient interface {
+	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
+	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
+	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenRequest]) (*connect.Response[v1.RefreshTokenResponse], error)
+	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	LogoutAll(context.Context, *connect.Request[v1.LogoutAllRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ForgotPassword(context.Context, *connect.Request[v1.ForgotPasswordRequest]) (*connect.Response[v1.ForgotPasswordResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	VerifyEmail(context.Context, *connect.Request[v1.VerifyEmailRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ResendEmailVerification(context.Context, *connect.Request[v1.ResendEmailVerificationRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error)
+	RevokeSession(context.Context, *connect.Request[v1.RevokeSessionRequest]) (*connect.Response[v1.AuthStatusResponse], error)
 }
 
 // NewAuthClient constructs a client for the auth.v1.Auth service. By default, it uses the Connect
@@ -39,15 +101,173 @@ type AuthClient interface {
 // The URL supplied here should be the base URL for the Connect or gRPC server (for example,
 // http://api.acme.com or https://acme.com/grpc).
 func NewAuthClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AuthClient {
-	return &authClient{}
+	baseURL = strings.TrimRight(baseURL, "/")
+	return &authClient{
+		register: connect.NewClient[v1.RegisterRequest, v1.RegisterResponse](
+			httpClient,
+			baseURL+AuthRegisterProcedure,
+			connect.WithSchema(authRegisterMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		login: connect.NewClient[v1.LoginRequest, v1.LoginResponse](
+			httpClient,
+			baseURL+AuthLoginProcedure,
+			connect.WithSchema(authLoginMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		refreshToken: connect.NewClient[v1.RefreshTokenRequest, v1.RefreshTokenResponse](
+			httpClient,
+			baseURL+AuthRefreshTokenProcedure,
+			connect.WithSchema(authRefreshTokenMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		logout: connect.NewClient[v1.LogoutRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthLogoutProcedure,
+			connect.WithSchema(authLogoutMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		logoutAll: connect.NewClient[v1.LogoutAllRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthLogoutAllProcedure,
+			connect.WithSchema(authLogoutAllMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		forgotPassword: connect.NewClient[v1.ForgotPasswordRequest, v1.ForgotPasswordResponse](
+			httpClient,
+			baseURL+AuthForgotPasswordProcedure,
+			connect.WithSchema(authForgotPasswordMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		resetPassword: connect.NewClient[v1.ResetPasswordRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthResetPasswordProcedure,
+			connect.WithSchema(authResetPasswordMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		changePassword: connect.NewClient[v1.ChangePasswordRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthChangePasswordProcedure,
+			connect.WithSchema(authChangePasswordMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		verifyEmail: connect.NewClient[v1.VerifyEmailRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthVerifyEmailProcedure,
+			connect.WithSchema(authVerifyEmailMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		resendEmailVerification: connect.NewClient[v1.ResendEmailVerificationRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthResendEmailVerificationProcedure,
+			connect.WithSchema(authResendEmailVerificationMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listSessions: connect.NewClient[v1.ListSessionsRequest, v1.ListSessionsResponse](
+			httpClient,
+			baseURL+AuthListSessionsProcedure,
+			connect.WithSchema(authListSessionsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		revokeSession: connect.NewClient[v1.RevokeSessionRequest, v1.AuthStatusResponse](
+			httpClient,
+			baseURL+AuthRevokeSessionProcedure,
+			connect.WithSchema(authRevokeSessionMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+	}
 }
 
 // authClient implements AuthClient.
 type authClient struct {
+	register                *connect.Client[v1.RegisterRequest, v1.RegisterResponse]
+	login                   *connect.Client[v1.LoginRequest, v1.LoginResponse]
+	refreshToken            *connect.Client[v1.RefreshTokenRequest, v1.RefreshTokenResponse]
+	logout                  *connect.Client[v1.LogoutRequest, v1.AuthStatusResponse]
+	logoutAll               *connect.Client[v1.LogoutAllRequest, v1.AuthStatusResponse]
+	forgotPassword          *connect.Client[v1.ForgotPasswordRequest, v1.ForgotPasswordResponse]
+	resetPassword           *connect.Client[v1.ResetPasswordRequest, v1.AuthStatusResponse]
+	changePassword          *connect.Client[v1.ChangePasswordRequest, v1.AuthStatusResponse]
+	verifyEmail             *connect.Client[v1.VerifyEmailRequest, v1.AuthStatusResponse]
+	resendEmailVerification *connect.Client[v1.ResendEmailVerificationRequest, v1.AuthStatusResponse]
+	listSessions            *connect.Client[v1.ListSessionsRequest, v1.ListSessionsResponse]
+	revokeSession           *connect.Client[v1.RevokeSessionRequest, v1.AuthStatusResponse]
+}
+
+// Register calls auth.v1.Auth.Register.
+func (c *authClient) Register(ctx context.Context, req *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
+	return c.register.CallUnary(ctx, req)
+}
+
+// Login calls auth.v1.Auth.Login.
+func (c *authClient) Login(ctx context.Context, req *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
+	return c.login.CallUnary(ctx, req)
+}
+
+// RefreshToken calls auth.v1.Auth.RefreshToken.
+func (c *authClient) RefreshToken(ctx context.Context, req *connect.Request[v1.RefreshTokenRequest]) (*connect.Response[v1.RefreshTokenResponse], error) {
+	return c.refreshToken.CallUnary(ctx, req)
+}
+
+// Logout calls auth.v1.Auth.Logout.
+func (c *authClient) Logout(ctx context.Context, req *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.logout.CallUnary(ctx, req)
+}
+
+// LogoutAll calls auth.v1.Auth.LogoutAll.
+func (c *authClient) LogoutAll(ctx context.Context, req *connect.Request[v1.LogoutAllRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.logoutAll.CallUnary(ctx, req)
+}
+
+// ForgotPassword calls auth.v1.Auth.ForgotPassword.
+func (c *authClient) ForgotPassword(ctx context.Context, req *connect.Request[v1.ForgotPasswordRequest]) (*connect.Response[v1.ForgotPasswordResponse], error) {
+	return c.forgotPassword.CallUnary(ctx, req)
+}
+
+// ResetPassword calls auth.v1.Auth.ResetPassword.
+func (c *authClient) ResetPassword(ctx context.Context, req *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.resetPassword.CallUnary(ctx, req)
+}
+
+// ChangePassword calls auth.v1.Auth.ChangePassword.
+func (c *authClient) ChangePassword(ctx context.Context, req *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.changePassword.CallUnary(ctx, req)
+}
+
+// VerifyEmail calls auth.v1.Auth.VerifyEmail.
+func (c *authClient) VerifyEmail(ctx context.Context, req *connect.Request[v1.VerifyEmailRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.verifyEmail.CallUnary(ctx, req)
+}
+
+// ResendEmailVerification calls auth.v1.Auth.ResendEmailVerification.
+func (c *authClient) ResendEmailVerification(ctx context.Context, req *connect.Request[v1.ResendEmailVerificationRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.resendEmailVerification.CallUnary(ctx, req)
+}
+
+// ListSessions calls auth.v1.Auth.ListSessions.
+func (c *authClient) ListSessions(ctx context.Context, req *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error) {
+	return c.listSessions.CallUnary(ctx, req)
+}
+
+// RevokeSession calls auth.v1.Auth.RevokeSession.
+func (c *authClient) RevokeSession(ctx context.Context, req *connect.Request[v1.RevokeSessionRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return c.revokeSession.CallUnary(ctx, req)
 }
 
 // AuthHandler is an implementation of the auth.v1.Auth service.
 type AuthHandler interface {
+	Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error)
+	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
+	RefreshToken(context.Context, *connect.Request[v1.RefreshTokenRequest]) (*connect.Response[v1.RefreshTokenResponse], error)
+	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	LogoutAll(context.Context, *connect.Request[v1.LogoutAllRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ForgotPassword(context.Context, *connect.Request[v1.ForgotPasswordRequest]) (*connect.Response[v1.ForgotPasswordResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	VerifyEmail(context.Context, *connect.Request[v1.VerifyEmailRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ResendEmailVerification(context.Context, *connect.Request[v1.ResendEmailVerificationRequest]) (*connect.Response[v1.AuthStatusResponse], error)
+	ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error)
+	RevokeSession(context.Context, *connect.Request[v1.RevokeSessionRequest]) (*connect.Response[v1.AuthStatusResponse], error)
 }
 
 // NewAuthHandler builds an HTTP handler from the service implementation. It returns the path on
@@ -56,8 +276,104 @@ type AuthHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewAuthHandler(svc AuthHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	authRegisterHandler := connect.NewUnaryHandler(
+		AuthRegisterProcedure,
+		svc.Register,
+		connect.WithSchema(authRegisterMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authLoginHandler := connect.NewUnaryHandler(
+		AuthLoginProcedure,
+		svc.Login,
+		connect.WithSchema(authLoginMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authRefreshTokenHandler := connect.NewUnaryHandler(
+		AuthRefreshTokenProcedure,
+		svc.RefreshToken,
+		connect.WithSchema(authRefreshTokenMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authLogoutHandler := connect.NewUnaryHandler(
+		AuthLogoutProcedure,
+		svc.Logout,
+		connect.WithSchema(authLogoutMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authLogoutAllHandler := connect.NewUnaryHandler(
+		AuthLogoutAllProcedure,
+		svc.LogoutAll,
+		connect.WithSchema(authLogoutAllMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authForgotPasswordHandler := connect.NewUnaryHandler(
+		AuthForgotPasswordProcedure,
+		svc.ForgotPassword,
+		connect.WithSchema(authForgotPasswordMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authResetPasswordHandler := connect.NewUnaryHandler(
+		AuthResetPasswordProcedure,
+		svc.ResetPassword,
+		connect.WithSchema(authResetPasswordMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authChangePasswordHandler := connect.NewUnaryHandler(
+		AuthChangePasswordProcedure,
+		svc.ChangePassword,
+		connect.WithSchema(authChangePasswordMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authVerifyEmailHandler := connect.NewUnaryHandler(
+		AuthVerifyEmailProcedure,
+		svc.VerifyEmail,
+		connect.WithSchema(authVerifyEmailMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authResendEmailVerificationHandler := connect.NewUnaryHandler(
+		AuthResendEmailVerificationProcedure,
+		svc.ResendEmailVerification,
+		connect.WithSchema(authResendEmailVerificationMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authListSessionsHandler := connect.NewUnaryHandler(
+		AuthListSessionsProcedure,
+		svc.ListSessions,
+		connect.WithSchema(authListSessionsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	authRevokeSessionHandler := connect.NewUnaryHandler(
+		AuthRevokeSessionProcedure,
+		svc.RevokeSession,
+		connect.WithSchema(authRevokeSessionMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/auth.v1.Auth/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case AuthRegisterProcedure:
+			authRegisterHandler.ServeHTTP(w, r)
+		case AuthLoginProcedure:
+			authLoginHandler.ServeHTTP(w, r)
+		case AuthRefreshTokenProcedure:
+			authRefreshTokenHandler.ServeHTTP(w, r)
+		case AuthLogoutProcedure:
+			authLogoutHandler.ServeHTTP(w, r)
+		case AuthLogoutAllProcedure:
+			authLogoutAllHandler.ServeHTTP(w, r)
+		case AuthForgotPasswordProcedure:
+			authForgotPasswordHandler.ServeHTTP(w, r)
+		case AuthResetPasswordProcedure:
+			authResetPasswordHandler.ServeHTTP(w, r)
+		case AuthChangePasswordProcedure:
+			authChangePasswordHandler.ServeHTTP(w, r)
+		case AuthVerifyEmailProcedure:
+			authVerifyEmailHandler.ServeHTTP(w, r)
+		case AuthResendEmailVerificationProcedure:
+			authResendEmailVerificationHandler.ServeHTTP(w, r)
+		case AuthListSessionsProcedure:
+			authListSessionsHandler.ServeHTTP(w, r)
+		case AuthRevokeSessionProcedure:
+			authRevokeSessionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -66,3 +382,51 @@ func NewAuthHandler(svc AuthHandler, opts ...connect.HandlerOption) (string, htt
 
 // UnimplementedAuthHandler returns CodeUnimplemented from all methods.
 type UnimplementedAuthHandler struct{}
+
+func (UnimplementedAuthHandler) Register(context.Context, *connect.Request[v1.RegisterRequest]) (*connect.Response[v1.RegisterResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.Register is not implemented"))
+}
+
+func (UnimplementedAuthHandler) Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.Login is not implemented"))
+}
+
+func (UnimplementedAuthHandler) RefreshToken(context.Context, *connect.Request[v1.RefreshTokenRequest]) (*connect.Response[v1.RefreshTokenResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.RefreshToken is not implemented"))
+}
+
+func (UnimplementedAuthHandler) Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.Logout is not implemented"))
+}
+
+func (UnimplementedAuthHandler) LogoutAll(context.Context, *connect.Request[v1.LogoutAllRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.LogoutAll is not implemented"))
+}
+
+func (UnimplementedAuthHandler) ForgotPassword(context.Context, *connect.Request[v1.ForgotPasswordRequest]) (*connect.Response[v1.ForgotPasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.ForgotPassword is not implemented"))
+}
+
+func (UnimplementedAuthHandler) ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.ResetPassword is not implemented"))
+}
+
+func (UnimplementedAuthHandler) ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.ChangePassword is not implemented"))
+}
+
+func (UnimplementedAuthHandler) VerifyEmail(context.Context, *connect.Request[v1.VerifyEmailRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.VerifyEmail is not implemented"))
+}
+
+func (UnimplementedAuthHandler) ResendEmailVerification(context.Context, *connect.Request[v1.ResendEmailVerificationRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.ResendEmailVerification is not implemented"))
+}
+
+func (UnimplementedAuthHandler) ListSessions(context.Context, *connect.Request[v1.ListSessionsRequest]) (*connect.Response[v1.ListSessionsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.ListSessions is not implemented"))
+}
+
+func (UnimplementedAuthHandler) RevokeSession(context.Context, *connect.Request[v1.RevokeSessionRequest]) (*connect.Response[v1.AuthStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("auth.v1.Auth.RevokeSession is not implemented"))
+}

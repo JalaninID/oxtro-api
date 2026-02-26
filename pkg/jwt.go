@@ -1,37 +1,57 @@
 package pkg
 
 import (
-	"encoding/json"
+	"errors"
 	"os"
 	"strconv"
 	"time"
 
-	"github.com/golang-jwt/jwt"
-	"github.com/sirupsen/logrus"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type MetaToken struct {
-	ID  string `json:"id"`
-	Exp string `json:"exp"`
+	ID        string `json:"id"`
+	SessionID string `json:"session_id"`
+	Exp       int64  `json:"exp"`
+	TokenType string `json:"token_type"`
 }
 
 type AccessToken struct {
 	Claims MetaToken
 }
 
-func Sign(Data map[string]any, expired int) (string, error) {
+type Claims struct {
+	ID        string `json:"id"`
+	SessionID string `json:"session_id"`
+	TokenType string `json:"token_type"`
+	jwt.RegisteredClaims
+}
+
+func Sign(data map[string]any, expired int) (string, error) {
 	duration, _ := strconv.Atoi(os.Getenv("JWT_TIME_DURATION"))
 	if expired > 0 {
 		duration = expired
 	}
 
-	drt := time.Minute * time.Duration(duration)
-	claims := jwt.MapClaims{}
-	claims["exp"] = time.Now().Add(drt).Unix()
+	ttl := time.Minute * time.Duration(duration)
+	expiresAt := time.Now().Add(ttl)
 
-	for i, v := range Data {
-		claims[i] = v
+	claims := Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
 	}
+	if id, ok := data["id"].(string); ok {
+		claims.ID = id
+	}
+	if sessionID, ok := data["session_id"].(string); ok {
+		claims.SessionID = sessionID
+	}
+	if tokenType, ok := data["token_type"].(string); ok {
+		claims.TokenType = tokenType
+	}
+
 	to := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	accessToken, err := to.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
 	if err != nil {
@@ -42,41 +62,52 @@ func Sign(Data map[string]any, expired int) (string, error) {
 }
 
 func VerifyTokenHeader(requestToken string) (MetaToken, error) {
-
-	token, err := jwt.Parse((requestToken), func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
-	})
+	token, err := VerifyToken(requestToken)
 	if err != nil {
 		return MetaToken{}, err
 	}
-	claimToken := DecodeToken(token)
-	return claimToken.Claims, nil
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return MetaToken{}, errors.New("invalid token claims")
+	}
+
+	return MetaToken{
+		ID:        claims.ID,
+		SessionID: claims.SessionID,
+		TokenType: claims.TokenType,
+		Exp:       claims.ExpiresAt.Unix(),
+	}, nil
 }
 
 func VerifyToken(accessToken string) (*jwt.Token, error) {
 	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
-
-	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(accessToken, claims, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, errors.New("unexpected signing method")
+		}
 		return []byte(jwtSecretKey), nil
 	})
-
 	if err != nil {
-		logrus.Error(err.Error())
 		return nil, err
 	}
-
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
 	return token, nil
 }
 
 func DecodeToken(accessToken *jwt.Token) AccessToken {
-	var token AccessToken
-	stringify, err := json.Marshal(&accessToken)
-	if err != nil {
-		return token
+	claims, ok := accessToken.Claims.(*Claims)
+	if !ok || claims.ExpiresAt == nil {
+		return AccessToken{}
 	}
-	err = json.Unmarshal(stringify, &token)
-	if err != nil {
-		return token
+	return AccessToken{
+		Claims: MetaToken{
+			ID:        claims.ID,
+			SessionID: claims.SessionID,
+			Exp:       claims.ExpiresAt.Unix(),
+			TokenType: claims.TokenType,
+		},
 	}
-	return token
 }

@@ -1,16 +1,27 @@
 package routers
 
-// import (
-// 	"app/gen/proto/auth/v1/authv1connect"
-// 	"app/injector"
-// 	"net/http"
+import (
+	"app/gen/auth/v1/authv1connect"
+	"app/injector"
+	"app/middleware"
 
-// 	"github.com/gin-gonic/gin"
-// )
+	"connectrpc.com/connect"
+)
 
-// func (r *Router) RouterAuth() {
-// 	_, handler := authv1connect.NewServiceAuthHandler(
-// 		injector.InitializedAuth(r.config.Database, r.config.Logger),
-// 	)
-// 	r.Engine.POST("/auth/*any", gin.WrapH(http.StripPrefix("/auth", handler)))
-// }
+func (r *Router) RouterAuth() {
+	publicProcedures := map[string]struct{}{
+		authv1connect.AuthRegisterProcedure:                {},
+		authv1connect.AuthLoginProcedure:                   {},
+		authv1connect.AuthRefreshTokenProcedure:            {},
+		authv1connect.AuthForgotPasswordProcedure:          {},
+		authv1connect.AuthResetPasswordProcedure:           {},
+		authv1connect.AuthVerifyEmailProcedure:             {},
+		authv1connect.AuthResendEmailVerificationProcedure: {},
+	}
+
+	path, handler := authv1connect.NewAuthHandler(
+		injector.InitializedAuth(r.config.Database, r.config.Logger),
+		connect.WithInterceptors(middleware.NewAuthInterceptor(publicProcedures)),
+	)
+	r.Mux.Handle(path, handler)
+}

@@ -41,6 +41,9 @@ func NewAuthInterceptor(publicProcedures map[string]struct{}) connect.UnaryInter
 			if err != nil {
 				return nil, connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
 			}
+			if metaToken.TokenType != "access" {
+				return nil, connect.NewError(connect.CodeUnauthenticated, constant.ErrAuthorization)
+			}
 
 			ctx = context.WithValue(ctx, principalContextKey{}, Principal{Token: metaToken})
 			return next(ctx, req)
