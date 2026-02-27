@@ -55,18 +55,26 @@ const (
 	// PluginManagerSetPluginConfigProcedure is the fully-qualified name of the PluginManager's
 	// SetPluginConfig RPC.
 	PluginManagerSetPluginConfigProcedure = "/plugin.v1.PluginManager/SetPluginConfig"
+	// PluginManagerGetPluginUiManifestProcedure is the fully-qualified name of the PluginManager's
+	// GetPluginUiManifest RPC.
+	PluginManagerGetPluginUiManifestProcedure = "/plugin.v1.PluginManager/GetPluginUiManifest"
+	// PluginManagerListActivePluginUiManifestsProcedure is the fully-qualified name of the
+	// PluginManager's ListActivePluginUiManifests RPC.
+	PluginManagerListActivePluginUiManifestsProcedure = "/plugin.v1.PluginManager/ListActivePluginUiManifests"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	pluginManagerServiceDescriptor                = v1.File_plugin_v1_plugin_proto.Services().ByName("PluginManager")
-	pluginManagerListPluginsMethodDescriptor      = pluginManagerServiceDescriptor.Methods().ByName("ListPlugins")
-	pluginManagerInstallPluginMethodDescriptor    = pluginManagerServiceDescriptor.Methods().ByName("InstallPlugin")
-	pluginManagerActivatePluginMethodDescriptor   = pluginManagerServiceDescriptor.Methods().ByName("ActivatePlugin")
-	pluginManagerDeactivatePluginMethodDescriptor = pluginManagerServiceDescriptor.Methods().ByName("DeactivatePlugin")
-	pluginManagerUninstallPluginMethodDescriptor  = pluginManagerServiceDescriptor.Methods().ByName("UninstallPlugin")
-	pluginManagerGetPluginConfigMethodDescriptor  = pluginManagerServiceDescriptor.Methods().ByName("GetPluginConfig")
-	pluginManagerSetPluginConfigMethodDescriptor  = pluginManagerServiceDescriptor.Methods().ByName("SetPluginConfig")
+	pluginManagerServiceDescriptor                           = v1.File_plugin_v1_plugin_proto.Services().ByName("PluginManager")
+	pluginManagerListPluginsMethodDescriptor                 = pluginManagerServiceDescriptor.Methods().ByName("ListPlugins")
+	pluginManagerInstallPluginMethodDescriptor               = pluginManagerServiceDescriptor.Methods().ByName("InstallPlugin")
+	pluginManagerActivatePluginMethodDescriptor              = pluginManagerServiceDescriptor.Methods().ByName("ActivatePlugin")
+	pluginManagerDeactivatePluginMethodDescriptor            = pluginManagerServiceDescriptor.Methods().ByName("DeactivatePlugin")
+	pluginManagerUninstallPluginMethodDescriptor             = pluginManagerServiceDescriptor.Methods().ByName("UninstallPlugin")
+	pluginManagerGetPluginConfigMethodDescriptor             = pluginManagerServiceDescriptor.Methods().ByName("GetPluginConfig")
+	pluginManagerSetPluginConfigMethodDescriptor             = pluginManagerServiceDescriptor.Methods().ByName("SetPluginConfig")
+	pluginManagerGetPluginUiManifestMethodDescriptor         = pluginManagerServiceDescriptor.Methods().ByName("GetPluginUiManifest")
+	pluginManagerListActivePluginUiManifestsMethodDescriptor = pluginManagerServiceDescriptor.Methods().ByName("ListActivePluginUiManifests")
 )
 
 // PluginManagerClient is a client for the plugin.v1.PluginManager service.
@@ -78,6 +86,8 @@ type PluginManagerClient interface {
 	UninstallPlugin(context.Context, *connect.Request[v1.PluginActionRequest]) (*connect.Response[v11.Empty], error)
 	GetPluginConfig(context.Context, *connect.Request[v1.GetPluginConfigRequest]) (*connect.Response[v1.GetPluginConfigResponse], error)
 	SetPluginConfig(context.Context, *connect.Request[v1.SetPluginConfigRequest]) (*connect.Response[v1.PluginActionResponse], error)
+	GetPluginUiManifest(context.Context, *connect.Request[v1.GetPluginUiManifestRequest]) (*connect.Response[v1.GetPluginUiManifestResponse], error)
+	ListActivePluginUiManifests(context.Context, *connect.Request[v1.ListActivePluginUiManifestsRequest]) (*connect.Response[v1.ListActivePluginUiManifestsResponse], error)
 }
 
 // NewPluginManagerClient constructs a client for the plugin.v1.PluginManager service. By default,
@@ -132,18 +142,32 @@ func NewPluginManagerClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(pluginManagerSetPluginConfigMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getPluginUiManifest: connect.NewClient[v1.GetPluginUiManifestRequest, v1.GetPluginUiManifestResponse](
+			httpClient,
+			baseURL+PluginManagerGetPluginUiManifestProcedure,
+			connect.WithSchema(pluginManagerGetPluginUiManifestMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		listActivePluginUiManifests: connect.NewClient[v1.ListActivePluginUiManifestsRequest, v1.ListActivePluginUiManifestsResponse](
+			httpClient,
+			baseURL+PluginManagerListActivePluginUiManifestsProcedure,
+			connect.WithSchema(pluginManagerListActivePluginUiManifestsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // pluginManagerClient implements PluginManagerClient.
 type pluginManagerClient struct {
-	listPlugins      *connect.Client[v1.ListPluginsRequest, v1.ListPluginsResponse]
-	installPlugin    *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
-	activatePlugin   *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
-	deactivatePlugin *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
-	uninstallPlugin  *connect.Client[v1.PluginActionRequest, v11.Empty]
-	getPluginConfig  *connect.Client[v1.GetPluginConfigRequest, v1.GetPluginConfigResponse]
-	setPluginConfig  *connect.Client[v1.SetPluginConfigRequest, v1.PluginActionResponse]
+	listPlugins                 *connect.Client[v1.ListPluginsRequest, v1.ListPluginsResponse]
+	installPlugin               *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
+	activatePlugin              *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
+	deactivatePlugin            *connect.Client[v1.PluginActionRequest, v1.PluginActionResponse]
+	uninstallPlugin             *connect.Client[v1.PluginActionRequest, v11.Empty]
+	getPluginConfig             *connect.Client[v1.GetPluginConfigRequest, v1.GetPluginConfigResponse]
+	setPluginConfig             *connect.Client[v1.SetPluginConfigRequest, v1.PluginActionResponse]
+	getPluginUiManifest         *connect.Client[v1.GetPluginUiManifestRequest, v1.GetPluginUiManifestResponse]
+	listActivePluginUiManifests *connect.Client[v1.ListActivePluginUiManifestsRequest, v1.ListActivePluginUiManifestsResponse]
 }
 
 // ListPlugins calls plugin.v1.PluginManager.ListPlugins.
@@ -181,6 +205,16 @@ func (c *pluginManagerClient) SetPluginConfig(ctx context.Context, req *connect.
 	return c.setPluginConfig.CallUnary(ctx, req)
 }
 
+// GetPluginUiManifest calls plugin.v1.PluginManager.GetPluginUiManifest.
+func (c *pluginManagerClient) GetPluginUiManifest(ctx context.Context, req *connect.Request[v1.GetPluginUiManifestRequest]) (*connect.Response[v1.GetPluginUiManifestResponse], error) {
+	return c.getPluginUiManifest.CallUnary(ctx, req)
+}
+
+// ListActivePluginUiManifests calls plugin.v1.PluginManager.ListActivePluginUiManifests.
+func (c *pluginManagerClient) ListActivePluginUiManifests(ctx context.Context, req *connect.Request[v1.ListActivePluginUiManifestsRequest]) (*connect.Response[v1.ListActivePluginUiManifestsResponse], error) {
+	return c.listActivePluginUiManifests.CallUnary(ctx, req)
+}
+
 // PluginManagerHandler is an implementation of the plugin.v1.PluginManager service.
 type PluginManagerHandler interface {
 	ListPlugins(context.Context, *connect.Request[v1.ListPluginsRequest]) (*connect.Response[v1.ListPluginsResponse], error)
@@ -190,6 +224,8 @@ type PluginManagerHandler interface {
 	UninstallPlugin(context.Context, *connect.Request[v1.PluginActionRequest]) (*connect.Response[v11.Empty], error)
 	GetPluginConfig(context.Context, *connect.Request[v1.GetPluginConfigRequest]) (*connect.Response[v1.GetPluginConfigResponse], error)
 	SetPluginConfig(context.Context, *connect.Request[v1.SetPluginConfigRequest]) (*connect.Response[v1.PluginActionResponse], error)
+	GetPluginUiManifest(context.Context, *connect.Request[v1.GetPluginUiManifestRequest]) (*connect.Response[v1.GetPluginUiManifestResponse], error)
+	ListActivePluginUiManifests(context.Context, *connect.Request[v1.ListActivePluginUiManifestsRequest]) (*connect.Response[v1.ListActivePluginUiManifestsResponse], error)
 }
 
 // NewPluginManagerHandler builds an HTTP handler from the service implementation. It returns the
@@ -240,6 +276,18 @@ func NewPluginManagerHandler(svc PluginManagerHandler, opts ...connect.HandlerOp
 		connect.WithSchema(pluginManagerSetPluginConfigMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	pluginManagerGetPluginUiManifestHandler := connect.NewUnaryHandler(
+		PluginManagerGetPluginUiManifestProcedure,
+		svc.GetPluginUiManifest,
+		connect.WithSchema(pluginManagerGetPluginUiManifestMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	pluginManagerListActivePluginUiManifestsHandler := connect.NewUnaryHandler(
+		PluginManagerListActivePluginUiManifestsProcedure,
+		svc.ListActivePluginUiManifests,
+		connect.WithSchema(pluginManagerListActivePluginUiManifestsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/plugin.v1.PluginManager/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case PluginManagerListPluginsProcedure:
@@ -256,6 +304,10 @@ func NewPluginManagerHandler(svc PluginManagerHandler, opts ...connect.HandlerOp
 			pluginManagerGetPluginConfigHandler.ServeHTTP(w, r)
 		case PluginManagerSetPluginConfigProcedure:
 			pluginManagerSetPluginConfigHandler.ServeHTTP(w, r)
+		case PluginManagerGetPluginUiManifestProcedure:
+			pluginManagerGetPluginUiManifestHandler.ServeHTTP(w, r)
+		case PluginManagerListActivePluginUiManifestsProcedure:
+			pluginManagerListActivePluginUiManifestsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -291,4 +343,12 @@ func (UnimplementedPluginManagerHandler) GetPluginConfig(context.Context, *conne
 
 func (UnimplementedPluginManagerHandler) SetPluginConfig(context.Context, *connect.Request[v1.SetPluginConfigRequest]) (*connect.Response[v1.PluginActionResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("plugin.v1.PluginManager.SetPluginConfig is not implemented"))
+}
+
+func (UnimplementedPluginManagerHandler) GetPluginUiManifest(context.Context, *connect.Request[v1.GetPluginUiManifestRequest]) (*connect.Response[v1.GetPluginUiManifestResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("plugin.v1.PluginManager.GetPluginUiManifest is not implemented"))
+}
+
+func (UnimplementedPluginManagerHandler) ListActivePluginUiManifests(context.Context, *connect.Request[v1.ListActivePluginUiManifestsRequest]) (*connect.Response[v1.ListActivePluginUiManifestsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("plugin.v1.PluginManager.ListActivePluginUiManifests is not implemented"))
 }

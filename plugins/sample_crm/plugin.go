@@ -1,9 +1,9 @@
 package sample_crm
 
 import (
-	"app/plugins/sample_crm/gen/sample_crm/v1/sample_crmv1connect"
 	"app/model"
 	"app/plugin"
+	"app/plugins/sample_crm/gen/sample_crm/v1/sample_crmv1connect"
 	"context"
 	"net/http"
 
@@ -96,4 +96,85 @@ func (p *CRMPlugin) MigrationDir() string {
 // MigrationTablePrefix returns the prefix for CRM tables.
 func (p *CRMPlugin) MigrationTablePrefix() string {
 	return "plg_crm_"
+}
+
+// UIManifest exposes schema-driven UI metadata for Oxtro UI hosts.
+func (p *CRMPlugin) UIManifest() plugin.UIManifest {
+	return plugin.UIManifest{
+		PluginID:              PluginID,
+		UISchemaVersion:       "1.0.0",
+		RequiresHostUIVersion: ">=1.0 <2.0",
+		Navigation: []plugin.NavigationItem{
+			{
+				ID:                  "crm.contacts",
+				Label:               "CRM Contacts",
+				Icon:                "users",
+				Path:                "/app/plugins/crm/contacts",
+				Order:               40,
+				RequiredPermissions: []string{"crm.contacts.read"},
+			},
+		},
+		Views: []plugin.UIView{
+			{
+				ID:        "crm.contacts.list",
+				Type:      "page",
+				RoutePath: "/app/plugins/crm/contacts",
+				Layout:    "default",
+				Root: plugin.UINode{
+					Component: "table",
+					NodeID:    "crm_contacts_table",
+					Props: map[string]string{
+						"title":             "Contacts",
+						"columns":           "[{\"key\":\"name\",\"label\":\"Name\"},{\"key\":\"email\",\"label\":\"Email\"},{\"key\":\"phone\",\"label\":\"Phone\"},{\"key\":\"company\",\"label\":\"Company\"}]",
+						"searchEnabled":     "true",
+						"paginationEnabled": "true",
+					},
+				},
+				DataSource: plugin.DataSource{
+					RPCMethod: "sample_crm.v1.CRM/ListContacts",
+					RequestMapping: map[string]string{
+						"page":     "$query.page",
+						"per_page": "$query.per_page",
+						"search":   "$query.search",
+					},
+					ResponseMapping: map[string]string{
+						"rows":  "$.contacts",
+						"total": "$.total",
+					},
+				},
+			},
+			{
+				ID:        "crm.contacts.create",
+				Type:      "page",
+				RoutePath: "/app/plugins/crm/contacts/new",
+				Layout:    "default",
+				Root: plugin.UINode{
+					Component: "form",
+					NodeID:    "crm_contact_form_create",
+					Props: map[string]string{
+						"fields": "[{\"key\":\"name\",\"type\":\"text\",\"required\":true},{\"key\":\"email\",\"type\":\"email\",\"required\":true},{\"key\":\"phone\",\"type\":\"text\"},{\"key\":\"company\",\"type\":\"text\"},{\"key\":\"notes\",\"type\":\"textarea\"}]",
+					},
+				},
+			},
+		},
+		Actions: []plugin.UIAction{
+			{
+				ID:                  "crm.createContact",
+				Label:               "Save Contact",
+				Type:                "rpc",
+				RPCMethod:           "sample_crm.v1.CRM/CreateContact",
+				RequiredPermissions: []string{"crm.contacts.write"},
+				SuccessToast:        "Contact created",
+			},
+			{
+				ID:                  "crm.deleteContact",
+				Label:               "Delete Contact",
+				Type:                "rpc",
+				RPCMethod:           "sample_crm.v1.CRM/DeleteContact",
+				RequiredPermissions: []string{"crm.contacts.delete"},
+				ConfirmMessage:      "Are you sure to delete this contact?",
+				SuccessToast:        "Contact deleted",
+			},
+		},
+	}
 }

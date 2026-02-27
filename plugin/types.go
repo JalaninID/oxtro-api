@@ -83,3 +83,97 @@ type HookSubscriber interface {
 	// SubscribeHooks is called during activation to register action and filter hooks.
 	SubscribeHooks(hooks *HookEngine)
 }
+
+// UIManifest describes plugin-contributed UI metadata for host-rendered frontends.
+// It intentionally stays schema-driven (no arbitrary JS) to keep UI secure and upgrade-safe.
+type UIManifest struct {
+	PluginID              string           `json:"plugin_id" yaml:"plugin_id"`
+	UISchemaVersion       string           `json:"ui_schema_version" yaml:"ui_schema_version"`
+	RequiresHostUIVersion string           `json:"requires_host_ui_version" yaml:"requires_host_ui_version"`
+	Navigation            []NavigationItem `json:"navigation" yaml:"navigation"`
+	Views                 []UIView         `json:"views" yaml:"views"`
+	ViewExtensions        []ViewExtension  `json:"view_extensions" yaml:"view_extensions"`
+	Actions               []UIAction       `json:"actions" yaml:"actions"`
+}
+
+type NavigationItem struct {
+	ID                  string   `json:"id" yaml:"id"`
+	Label               string   `json:"label" yaml:"label"`
+	Icon                string   `json:"icon" yaml:"icon"`
+	Path                string   `json:"path" yaml:"path"`
+	Order               int32    `json:"order" yaml:"order"`
+	RequiredPermissions []string `json:"required_permissions" yaml:"required_permissions"`
+}
+
+type UIView struct {
+	ID         string     `json:"id" yaml:"id"`
+	Type       string     `json:"type" yaml:"type"`
+	RoutePath  string     `json:"route_path" yaml:"route_path"`
+	Layout     string     `json:"layout" yaml:"layout"`
+	Root       UINode     `json:"root" yaml:"root"`
+	DataSource DataSource `json:"data_source" yaml:"data_source"`
+}
+
+type UINode struct {
+	Component string            `json:"component" yaml:"component"`
+	NodeID    string            `json:"node_id" yaml:"node_id"`
+	Props     map[string]string `json:"props" yaml:"props"`
+	Children  []UINode          `json:"children" yaml:"children"`
+}
+
+type DataSource struct {
+	RPCMethod       string            `json:"rpc_method" yaml:"rpc_method"`
+	RequestMapping  map[string]string `json:"request_mapping" yaml:"request_mapping"`
+	ResponseMapping map[string]string `json:"response_mapping" yaml:"response_mapping"`
+}
+
+type ViewExtension struct {
+	ID           string           `json:"id" yaml:"id"`
+	TargetViewID string           `json:"target_view_id" yaml:"target_view_id"`
+	Priority     int32            `json:"priority" yaml:"priority"`
+	Operations   []PatchOperation `json:"operations" yaml:"operations"`
+}
+
+type PatchOperation struct {
+	Op       PatchOp           `json:"op" yaml:"op"`
+	Selector Selector          `json:"selector" yaml:"selector"`
+	Node     UINode            `json:"node" yaml:"node"`
+	SetProps map[string]string `json:"set_props" yaml:"set_props"`
+}
+
+type PatchOp string
+
+const (
+	PatchOpInsertBefore PatchOp = "insert_before"
+	PatchOpInsertAfter  PatchOp = "insert_after"
+	PatchOpReplace      PatchOp = "replace"
+	PatchOpSetProps     PatchOp = "set_props"
+	PatchOpRemove       PatchOp = "remove"
+)
+
+type Selector struct {
+	By    SelectorBy `json:"by" yaml:"by"`
+	Value string     `json:"value" yaml:"value"`
+}
+
+type SelectorBy string
+
+const (
+	SelectorByNodeID SelectorBy = "node_id"
+	SelectorByPath   SelectorBy = "path"
+)
+
+type UIAction struct {
+	ID                  string   `json:"id" yaml:"id"`
+	Label               string   `json:"label" yaml:"label"`
+	Type                string   `json:"type" yaml:"type"`
+	RPCMethod           string   `json:"rpc_method" yaml:"rpc_method"`
+	RequiredPermissions []string `json:"required_permissions" yaml:"required_permissions"`
+	ConfirmMessage      string   `json:"confirm_message" yaml:"confirm_message"`
+	SuccessToast        string   `json:"success_toast" yaml:"success_toast"`
+}
+
+// UIManifestProvider is an optional interface for plugins exposing host-rendered UI schema.
+type UIManifestProvider interface {
+	UIManifest() UIManifest
+}

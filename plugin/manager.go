@@ -255,9 +255,10 @@ func (m *Manager) RegisterRoutes(mux *http.ServeMux) {
 		pctx := m.buildPluginContext(id)
 		pluginMux := http.NewServeMux()
 		rr.RegisterRoutes(pluginMux, pctx)
-		prefix := fmt.Sprintf("/plugins/%s/", id)
-		mux.Handle(prefix, http.StripPrefix(prefix, pluginMux))
-		m.logger.WithField("plugin", id).Infof("registered routes at %s", prefix)
+		routePrefix := fmt.Sprintf("/plugins/%s/", id)
+		stripPrefix := fmt.Sprintf("/plugins/%s", id)
+		mux.Handle(routePrefix, http.StripPrefix(stripPrefix, pluginMux))
+		m.logger.WithField("plugin", id).Infof("registered routes at %s", routePrefix)
 	}
 }
 
@@ -265,6 +266,12 @@ func (m *Manager) RegisterRoutes(mux *http.ServeMux) {
 type PluginInfo struct {
 	Manifest Manifest    `json:"manifest"`
 	State    PluginState `json:"state"`
+}
+
+type PluginUIManifestInfo struct {
+	PluginID string      `json:"plugin_id"`
+	State    PluginState `json:"state"`
+	Manifest UIManifest  `json:"manifest"`
 }
 
 func (m *Manager) ListPlugins() []PluginInfo {
@@ -276,6 +283,54 @@ func (m *Manager) ListPlugins() []PluginInfo {
 		list = append(list, PluginInfo{
 			Manifest: p.Manifest(),
 			State:    m.states[id],
+		})
+	}
+	return list
+}
+
+// GetPluginUIManifest returns UI schema metadata for a specific plugin.
+func (m *Manager) GetPluginUIManifest(pluginID string) (UIManifest, error) {
+	p, err := m.getPlugin(pluginID)
+	if err != nil {
+		return UIManifest{}, err
+	}
+
+	provider, ok := p.(UIManifestProvider)
+	if !ok {
+		return UIManifest{}, fmt.Errorf("%w: %s", ErrPluginUIManifestNotFound, pluginID)
+	}
+
+	manifest := provider.UIManifest()
+	if manifest.PluginID == "" {
+		manifest.PluginID = pluginID
+	}
+	return manifest, nil
+}
+
+// ListActivePluginUIManifests returns UI manifests for active plugins only.
+func (m *Manager) ListActivePluginUIManifests() []PluginUIManifestInfo {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	list := make([]PluginUIManifestInfo, 0, len(m.registry))
+	for id, p := range m.registry {
+		if m.states[id] != StateActive {
+			continue
+		}
+		provider, ok := p.(UIManifestProvider)
+		if !ok {
+			continue
+		}
+
+		manifest := provider.UIManifest()
+		if manifest.PluginID == "" {
+			manifest.PluginID = id
+		}
+
+		list = append(list, PluginUIManifestInfo{
+			PluginID: id,
+			State:    m.states[id],
+			Manifest: manifest,
 		})
 	}
 	return list

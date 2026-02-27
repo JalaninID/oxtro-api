@@ -1,7 +1,12 @@
 include .env
 
 gen-proto:
-	rm -rf gen && buf generate
+	rm -rf gen && buf generate oxtro-proto
+
+gen-proto-plugin:
+	rm -rf plugins/sample_crm/gen && buf generate plugins/sample_crm/proto --template plugins/sample_crm/buf.gen.yaml
+
+gen-proto-all: gen-proto gen-proto-plugin
 wire :
 	wire gen app/injector
 
