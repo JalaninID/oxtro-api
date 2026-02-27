@@ -13,13 +13,13 @@ import (
 func NewSetRepositoryOrganization(db *gorm.DB) domain.RepositoryOrganization {
 	return repo_organization.NewRepository(db)
 }
-func NewSetServiceOrganization(repo domain.RepositoryOrganization, logger *logrus.Logger) domain.ServiceOrganization {
-	return service_organization.NewService(repo, logger)
+func NewSetServiceOrganization(repo domain.RepositoryOrganization, logger *logrus.Logger, hooks domain.HookDispatcher) domain.ServiceOrganization {
+	return service_organization.NewService(repo, logger, hooks)
 }
 
-func InitializedOrganization(db *gorm.DB, logger *logrus.Logger) *handler_organization.Organization {
+func InitializedOrganization(db *gorm.DB, logger *logrus.Logger, hooks domain.HookDispatcher) *handler_organization.Organization {
 	repo := NewSetRepositoryOrganization(db)
-	service := NewSetServiceOrganization(repo, logger)
+	service := NewSetServiceOrganization(repo, logger, hooks)
 	handler := handler_organization.NewHandlerOrganization(service)
 	return handler
 }

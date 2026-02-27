@@ -29,5 +29,8 @@ func (s *service) CreateOrganization(ctx context.Context, req *organizationv1.Re
 		s.logger.Errorf("error create organization: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
+
+	s.hooks.DoAction(ctx, "organization.created", result)
+
 	return FormatterResponseOrganization(result), nil
 }

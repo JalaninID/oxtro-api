@@ -10,7 +10,7 @@ import (
 
 func (r *Router) RouterOrganization() {
 	path, handler := organizationv1connect.NewOrganizationHandler(
-		injector.InitializedOrganization(r.config.Database, r.config.Logger),
+		injector.InitializedOrganization(r.config.Database, r.config.Logger, r.hooks),
 		connect.WithInterceptors(middleware.NewAuthInterceptor(nil)),
 	)
 

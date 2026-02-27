@@ -34,5 +34,7 @@ func (s *service) UpdateOrganization(ctx context.Context, req *organizationv1.Re
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
 
+	s.hooks.DoAction(ctx, "organization.updated", res)
+
 	return FormatterResponseOrganization(res), nil
 }

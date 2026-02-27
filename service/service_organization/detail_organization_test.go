@@ -27,7 +27,7 @@ func TestDetailOrganization(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 
 		expectedOrg := model.Organization{ID: 1, Name: "Test Org"}
 		mockRepoOrg.On("DetailOrganization", ctx, mock.Anything).Return(expectedOrg, nil)
@@ -41,7 +41,7 @@ func TestDetailOrganization(t *testing.T) {
 
 	t.Run("Not Found", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 
 		mockRepoOrg.On("DetailOrganization", ctx, mock.Anything).Return(model.Organization{}, gorm.ErrRecordNotFound)
 
@@ -58,7 +58,7 @@ func TestDetailOrganization(t *testing.T) {
 
 	t.Run("Error Internal", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 
 		mockRepoOrg.On("DetailOrganization", ctx, mock.Anything).Return(model.Organization{}, errors.New("internal error"))
 

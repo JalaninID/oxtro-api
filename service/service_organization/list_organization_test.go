@@ -19,7 +19,7 @@ func TestListOrganization(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Test List Organization Success", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 		expectedOrg := []model.Organization{
 			{
 				ID:          1,
@@ -52,7 +52,7 @@ func TestListOrganization(t *testing.T) {
 	})
 	t.Run("Test List Organization Failed", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 		mockRepoOrg.On("ListOrganization", ctx, mock.Anything).Return(nil, 0, errors.New("error"))
 		result, err := mockServiceOrg.ListOrganization(ctx, &organizationv1.ParamsOrganization{})
 		assert.Error(t, err)

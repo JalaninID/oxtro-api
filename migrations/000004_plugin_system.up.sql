@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS plugins (
+    id BIGSERIAL PRIMARY KEY,
+    plugin_id VARCHAR(255) NOT NULL UNIQUE,
+    version VARCHAR(50) NOT NULL,
+    state VARCHAR(20) NOT NULL DEFAULT 'installed',
+    manifest JSONB NOT NULL DEFAULT '{}',
+    config JSONB NOT NULL DEFAULT '{}',
+    created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_plugins_state ON plugins(state);
+
+CREATE TABLE IF NOT EXISTS plugin_configs (
+    id BIGSERIAL PRIMARY KEY,
+    plugin_id VARCHAR(255) NOT NULL,
+    key VARCHAR(255) NOT NULL,
+    value TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_plugin_configs_plugin FOREIGN KEY (plugin_id) REFERENCES plugins(plugin_id) ON DELETE CASCADE,
+    CONSTRAINT uq_plugin_config_key UNIQUE (plugin_id, key)
+);
+
+CREATE TABLE IF NOT EXISTS plugin_migrations (
+    id BIGSERIAL PRIMARY KEY,
+    plugin_id VARCHAR(255) NOT NULL UNIQUE,
+    version INT NOT NULL DEFAULT 0,
+    dirty BOOLEAN NOT NULL DEFAULT false,
+    applied_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW()
+);

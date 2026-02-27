@@ -18,7 +18,7 @@ func TestUpdateOrganization(t *testing.T) {
 	ctx := context.Background()
 	t.Run("success", func(t *testing.T) {
 		mockRepoOrg := new(mocks.RepositoryOrganization)
-		service := NewService(mockRepoOrg, &logrus.Logger{})
+		service := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 		mockRepoOrg.On("DetailOrganization", ctx, mock.AnythingOfType("model.FilterOrganization")).
 			Return(model.Organization{UUID: "uuid"}, nil)
 		mockRepoOrg.On("UpdateOrganization", ctx, mock.AnythingOfType("model.FilterOrganization"), mock.AnythingOfType("model.Organization")).
@@ -33,7 +33,7 @@ func TestUpdateOrganization(t *testing.T) {
 	})
 	t.Run("Error Not Found Organization", func(t *testing.T) {
 		mockRepoOrg := new(mocks.RepositoryOrganization)
-		service := NewService(mockRepoOrg, &logrus.Logger{})
+		service := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 		mockRepoOrg.On("DetailOrganization", ctx, mock.AnythingOfType("model.FilterOrganization")).
 			Return(model.Organization{}, gorm.ErrRecordNotFound)
 		result, err := service.UpdateOrganization(ctx, &organizationv1.RequestOrganization{
@@ -46,7 +46,7 @@ func TestUpdateOrganization(t *testing.T) {
 
 	t.Run("Error Update Organization", func(t *testing.T) {
 		mockRepoOrg := new(mocks.RepositoryOrganization)
-		service := NewService(mockRepoOrg, &logrus.Logger{})
+		service := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 		mockRepoOrg.On("DetailOrganization", ctx, mock.AnythingOfType("model.FilterOrganization")).
 			Return(model.Organization{UUID: "uuid"}, nil)
 		mockRepoOrg.On("UpdateOrganization", ctx, mock.AnythingOfType("model.FilterOrganization"), mock.AnythingOfType("model.Organization")).

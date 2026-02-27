@@ -28,5 +28,8 @@ func (s *service) DeleteOrganization(ctx context.Context, req *organizationv1.Pa
 		s.logger.Errorf("Error delete organization: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
+
+	s.hooks.DoAction(ctx, "organization.deleted", org.ID)
+
 	return &toolsv1.Empty{}, nil
 }

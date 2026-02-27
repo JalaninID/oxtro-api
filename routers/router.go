@@ -2,6 +2,7 @@ package routers
 
 import (
 	"app/config"
+	"app/domain"
 	"app/middleware"
 	"app/pkg"
 	"fmt"
@@ -15,6 +16,7 @@ import (
 type Router struct {
 	config *config.Config
 	Mux    *http.ServeMux
+	hooks  domain.HookDispatcher
 }
 
 func startupBanner(addr string) {
@@ -32,11 +34,12 @@ Listening on %s
 	fmt.Println()
 }
 
-func NewRouter(config *config.Config) *Router {
+func NewRouter(config *config.Config, hooks domain.HookDispatcher) *Router {
 	mux := http.NewServeMux()
 	return &Router{
 		config: config,
 		Mux:    mux,
+		hooks:  hooks,
 	}
 }
 func (r *Router) Run() error {

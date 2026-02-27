@@ -9,8 +9,9 @@ import (
 type service struct {
 	repoOrg domain.RepositoryOrganization
 	logger  *logrus.Logger
+	hooks   domain.HookDispatcher
 }
 
-func NewService(repoOrg domain.RepositoryOrganization, logger *logrus.Logger) *service {
-	return &service{repoOrg: repoOrg, logger: logger}
+func NewService(repoOrg domain.RepositoryOrganization, logger *logrus.Logger, hooks domain.HookDispatcher) *service {
+	return &service{repoOrg: repoOrg, logger: logger, hooks: hooks}
 }

@@ -19,14 +19,14 @@ func NewSetRepositoryAuth(db *gorm.DB) domain.RepositoryAuth {
 	return repo_auth.NewRepository(db)
 }
 
-func NewSetServiceAuth(repoUser domain.RepositoryUser, repoAuth domain.RepositoryAuth, logger *logrus.Logger) domain.ServiceAuth {
-	return service_auth.NewService(repoUser, repoAuth, logger)
+func NewSetServiceAuth(repoUser domain.RepositoryUser, repoAuth domain.RepositoryAuth, logger *logrus.Logger, hooks domain.HookDispatcher) domain.ServiceAuth {
+	return service_auth.NewService(repoUser, repoAuth, logger, hooks)
 }
 
-func InitializedAuth(db *gorm.DB, logger *logrus.Logger) *handler_auth.Auth {
+func InitializedAuth(db *gorm.DB, logger *logrus.Logger, hooks domain.HookDispatcher) *handler_auth.Auth {
 	repoUser := NewSetRepositoryUser(db)
 	repoAuth := NewSetRepositoryAuth(db)
-	service := NewSetServiceAuth(repoUser, repoAuth, logger)
+	service := NewSetServiceAuth(repoUser, repoAuth, logger, hooks)
 	handler := handler_auth.NewHandlerAuth(service)
 	return handler
 }

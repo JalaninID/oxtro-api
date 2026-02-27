@@ -17,7 +17,7 @@ import (
 func TestCreateOrganization(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 
 		ctx := context.Background()
 		req := &organizationv1.RequestOrganization{
@@ -38,7 +38,7 @@ func TestCreateOrganization(t *testing.T) {
 
 	t.Run("Failed", func(t *testing.T) {
 		mockRepoOrg := &mocks.RepositoryOrganization{}
-		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{})
+		mockServiceOrg := NewService(mockRepoOrg, &logrus.Logger{}, &mocks.HookDispatcher{})
 
 		ctx := context.Background()
 		req := &organizationv1.RequestOrganization{

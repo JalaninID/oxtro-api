@@ -23,13 +23,15 @@ type service struct {
 	repoUser domain.RepositoryUser
 	repoAuth domain.RepositoryAuth
 	logger   *logrus.Logger
+	hooks    domain.HookDispatcher
 }
 
-func NewService(repoUser domain.RepositoryUser, repoAuth domain.RepositoryAuth, logger *logrus.Logger) *service {
+func NewService(repoUser domain.RepositoryUser, repoAuth domain.RepositoryAuth, logger *logrus.Logger, hooks domain.HookDispatcher) *service {
 	return &service{
 		repoUser: repoUser,
 		repoAuth: repoAuth,
 		logger:   logger,
+		hooks:    hooks,
 	}
 }
 
@@ -74,6 +76,8 @@ func (s *service) Register(ctx context.Context, req *authv1.RegisterRequest) (*a
 	if err := s.issueEmailVerification(ctx, createdUser.ID); err != nil {
 		s.logger.Errorf("register issue email verification failed: %v", err)
 	}
+
+	s.hooks.DoAction(ctx, "user.registered", createdUser)
 
 	return &authv1.RegisterResponse{
 		Id:        createdUser.UUID,
@@ -154,6 +158,8 @@ func (s *service) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.
 			Metadata:  user.Email,
 		})
 	}
+
+	s.hooks.DoAction(ctx, "user.logged_in", user)
 
 	return tokenResponse, nil
 }
@@ -238,6 +244,7 @@ func (s *service) Logout(ctx context.Context, req *authv1.LogoutRequest) (*authv
 		s.logger.Errorf("logout revoke session failed: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
+	s.hooks.DoAction(ctx, "user.logged_out", nil)
 	return &authv1.AuthStatusResponse{Success: true, Message: "logged out"}, nil
 }
 
@@ -346,6 +353,7 @@ func (s *service) ChangePassword(ctx context.Context, req *authv1.ChangePassword
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
 	_ = s.repoAuth.RevokeAllSessionsByUserID(ctx, user.ID)
+	s.hooks.DoAction(ctx, "user.password_changed", user)
 	return &authv1.AuthStatusResponse{Success: true, Message: "password changed"}, nil
 }
 
@@ -370,6 +378,8 @@ func (s *service) VerifyEmail(ctx context.Context, req *authv1.VerifyEmailReques
 	if err := s.repoAuth.MarkEmailVerificationUsed(ctx, verification.ID); err != nil {
 		return nil, connect.NewError(connect.CodeInternal, constant.ErrInternalServer)
 	}
+
+	s.hooks.DoAction(ctx, "user.email_verified", verification.UserID)
 
 	return &authv1.AuthStatusResponse{Success: true, Message: "email verified"}, nil
 }

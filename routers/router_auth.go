@@ -20,7 +20,7 @@ func (r *Router) RouterAuth() {
 	}
 
 	path, handler := authv1connect.NewAuthHandler(
-		injector.InitializedAuth(r.config.Database, r.config.Logger),
+		injector.InitializedAuth(r.config.Database, r.config.Logger, r.hooks),
 		connect.WithInterceptors(middleware.NewAuthInterceptor(publicProcedures)),
 	)
 	r.Mux.Handle(path, handler)
