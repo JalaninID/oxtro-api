@@ -5,8 +5,8 @@
 package sample_crmv1connect
 
 import (
-	v1 "app/gen/sample_crm/v1"
 	v11 "app/gen/tools/v1"
+	v1 "app/plugins/sample_crm/gen/sample_crm/v1"
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"

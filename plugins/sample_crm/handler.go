@@ -1,8 +1,8 @@
 package sample_crm
 
 import (
-	crmv1 "app/gen/sample_crm/v1"
-	"app/gen/sample_crm/v1/sample_crmv1connect"
+	crmv1 "app/plugins/sample_crm/gen/sample_crm/v1"
+	"app/plugins/sample_crm/gen/sample_crm/v1/sample_crmv1connect"
 	toolsv1 "app/gen/tools/v1"
 	"context"
 	"time"

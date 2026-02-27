@@ -1,7 +1,7 @@
 package sample_crm
 
 import (
-	"app/gen/sample_crm/v1/sample_crmv1connect"
+	"app/plugins/sample_crm/gen/sample_crm/v1/sample_crmv1connect"
 	"app/model"
 	"app/plugin"
 	"context"

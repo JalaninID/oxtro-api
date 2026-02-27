@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package sample_crm.v1;
+
+option go_package = "app/plugins/sample_crm/gen/sample_crm/v1;sample_crmv1";
+
+import "tools/v1/empty.proto";
+
+message Contact {
+    int64  id = 1;
+    string uuid = 2;
+    string name = 3;
+    string email = 4;
+    string phone = 5;
+    string company = 6;
+    string notes = 7;
+    string created_at = 8;
+    string updated_at = 9;
+}
+
+message CreateContactRequest {
+    string name = 1;
+    string email = 2;
+    string phone = 3;
+    string company = 4;
+    string notes = 5;
+}
+
+message UpdateContactRequest {
+    string uuid = 1;
+    string name = 2;
+    string email = 3;
+    string phone = 4;
+    string company = 5;
+    string notes = 6;
+}
+
+message ContactParams {
+    string uuid = 1;
+    int32  page = 2;
+    int32  per_page = 3;
+    string search = 4;
+}
+
+message ContactListResponse {
+    repeated Contact contacts = 1;
+    int32 total = 2;
+}
+
+service CRM {
+    rpc CreateContact(CreateContactRequest) returns (Contact);
+    rpc GetContact(ContactParams) returns (Contact);
+    rpc ListContacts(ContactParams) returns (ContactListResponse);
+    rpc UpdateContact(UpdateContactRequest) returns (Contact);
+    rpc DeleteContact(ContactParams) returns (tools.v1.Empty);
+}
