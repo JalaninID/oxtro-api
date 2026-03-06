@@ -20,9 +20,7 @@ func (r *repository) DetailUser(ctx context.Context, filter model.FilterUser) (m
 	}
 
 	var user model.User
-	err := r.db.WithContext(ctx).Where(where, args...).
-		Preload("UserOrganization").Preload("UserOrganization.Role").
-		First(&user).Error
+	err := r.db.WithContext(ctx).Where(where, args...).First(&user).Error
 	if err != nil {
 		return model.User{}, err
 	}

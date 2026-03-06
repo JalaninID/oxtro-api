@@ -26,7 +26,7 @@ func (p *CRMPlugin) Manifest() plugin.Manifest {
 		Category:      "business",
 		Homepage:      "https://github.com/oxtro/oxtro-crm",
 		License:       "MIT",
-		Permissions:   []string{"database:write", "hooks:auth", "hooks:organization"},
+		Permissions:   []string{"database:write", "hooks:auth"},
 	}
 }
 
@@ -81,11 +81,6 @@ func (p *CRMPlugin) SubscribeHooks(hooks *plugin.HookEngine) {
 		return nil
 	})
 
-	// React when an organization is created
-	hooks.AddAction(plugin.HookOrgCreated, PluginID, 10, func(ctx context.Context, payload any) error {
-		// Could link org data to CRM
-		return nil
-	})
 }
 
 // MigrationDir returns the path to CRM migration files.

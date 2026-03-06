@@ -24,7 +24,7 @@ func TestWithRequestLogger_LogsFiberLikeFields(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 	}), logger)
 
-	req := httptest.NewRequest(http.MethodPost, "/organization.v1.Organization/ListOrganization", nil)
+	req := httptest.NewRequest(http.MethodPost, "/auth.v1.Auth/Login", nil)
 	req.RemoteAddr = "127.0.0.1:1234"
 
 	rec := httptest.NewRecorder()
@@ -35,7 +35,7 @@ func TestWithRequestLogger_LogsFiberLikeFields(t *testing.T) {
 		" | 201 | ",
 		"127.0.0.1",
 		"POST",
-		"/organization.v1.Organization/ListOrganization",
+		"/auth.v1.Auth/Login",
 		" | -",
 	}
 	for _, part := range expectedParts {

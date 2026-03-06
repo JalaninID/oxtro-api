@@ -12,7 +12,7 @@ func TestWithCORS_PreflightAllowsConnectAndAuthorizationHeaders(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req := httptest.NewRequest(http.MethodOptions, "/organization.v1.Organization/ListOrganization", nil)
+	req := httptest.NewRequest(http.MethodOptions, "/auth.v1.Auth/Login", nil)
 	req.Header.Set("Origin", "http://localhost:5173")
 	req.Header.Set("Access-Control-Request-Method", http.MethodPost)
 	req.Header.Set("Access-Control-Request-Headers", "Content-Type,Connect-Protocol-Version,Authorization")

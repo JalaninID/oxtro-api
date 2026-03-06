@@ -26,7 +26,6 @@ func main() {
 
 	router := routers.NewRouter(conf, hooks)
 	router.RouterAuth()
-	router.RouterOrganization()
 	router.RouterPlugin(manager)
 
 	// Register routes from all active plugins

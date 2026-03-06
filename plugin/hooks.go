@@ -10,11 +10,6 @@ const (
 	HookPasswordChanged   = "user.password_changed"
 	HookEmailVerified     = "user.email_verified"
 
-	// Organization action hooks
-	HookOrgCreated = "organization.created"
-	HookOrgUpdated = "organization.updated"
-	HookOrgDeleted = "organization.deleted"
-
 	// Plugin system action hooks
 	HookPluginsLoaded     = "plugins.loaded"
 	HookPluginActivated   = "plugin.activated"
@@ -23,8 +18,6 @@ const (
 
 // Core filter hook names. Data passes through these and can be modified by plugins.
 const (
-	FilterRegisterData    = "user.register.data"
-	FilterLoginResponse   = "user.login.response"
-	FilterOrgCreateData   = "organization.create.data"
-	FilterOrgListResponse = "organization.list.response"
+	FilterRegisterData  = "user.register.data"
+	FilterLoginResponse = "user.login.response"
 )
