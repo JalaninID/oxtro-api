@@ -5,6 +5,8 @@ import (
 	"app/domain"
 	"app/middleware"
 	"app/pkg"
+	"app/repository/repo_setup"
+	"app/service/service_setup"
 	"fmt"
 	"net/http"
 	"time"
@@ -14,9 +16,10 @@ import (
 )
 
 type Router struct {
-	config *config.Config
-	Mux    *http.ServeMux
-	hooks  domain.HookDispatcher
+	config       *config.Config
+	Mux          *http.ServeMux
+	hooks        domain.HookDispatcher
+	setupService domain.ServiceSetup
 }
 
 func startupBanner(addr string) {
@@ -37,13 +40,19 @@ Listening on %s
 func NewRouter(config *config.Config, hooks domain.HookDispatcher) *Router {
 	mux := http.NewServeMux()
 	return &Router{
-		config: config,
-		Mux:    mux,
-		hooks:  hooks,
+		config:       config,
+		Mux:          mux,
+		hooks:        hooks,
+		setupService: service_setup.NewService(repo_setup.NewRepository(config.Database), config.Database, config.Logger),
 	}
 }
 func (r *Router) Run() error {
-	handler := middleware.WithRequestLogger(middleware.WithCORS(r.Mux), pkg.NewRequestDebugLogger())
+	handler := middleware.WithRequestLogger(
+		middleware.WithCORS(
+			middleware.WithSetupGate(r.Mux, r.setupService),
+		),
+		pkg.NewRequestDebugLogger(),
+	)
 	server := &http.Server{
 		Addr:              ":8080",
 		Handler:           h2c.NewHandler(handler, &http2.Server{CountError: func(errType string) { fmt.Println(errType) }}),

@@ -25,6 +25,7 @@ func main() {
 	}
 
 	router := routers.NewRouter(conf, hooks)
+	router.RouterSetup()
 	router.RouterAuth()
 	router.RouterPlugin(manager)
 
